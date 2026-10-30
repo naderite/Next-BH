@@ -72,7 +72,10 @@ class RagStub:
 
     @classmethod
     def retrieve_context(cls, query, top_k=5):
-        docs = cls.retrieve(query, top_k)
+        return cls.build_context(cls.retrieve(query, top_k))
+
+    @staticmethod
+    def build_context(docs):
         return "".join(
             f"[Doc {i} - {d['metadata']['source']}]\n{d['document']}\n\n"
             for i, d in enumerate(docs, 1)
@@ -89,6 +92,11 @@ def _install_stubs():
     rag_mod.retrieve = RagStub.retrieve
     rag_mod.retrieve_context = RagStub.retrieve_context
     rag_mod.get_index_info = lambda: {"index_version": "test-index", "collection": "legal_docs"}
+    rag_mod.build_context = RagStub.build_context
+    rag_mod.source_of = lambda d: {
+        "source_id": d["metadata"]["source"], "source": d["metadata"]["source"],
+        "document_version": d["metadata"].get("document_version", "unknown"), "page": None,
+    }
     rag_pkg.rag = rag_mod
     rag_pkg.retrieve_context = RagStub.retrieve_context
     sys.modules["rag_model"] = rag_pkg

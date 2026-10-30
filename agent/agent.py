@@ -1,6 +1,8 @@
 from utils.llm_utils import LLM
 import gc
 
+import feature_flags
+
 from utils.general_utils import *
 from utils.endpoint_utils import (
     get_strategy_specific_prompts,
@@ -33,6 +35,41 @@ class SalesAgent:
     def __init__(self):
 
         self.llm = LLM()
+        self._orchestrator = None
+        # decision metadata of the last generated message, persisted with it by the callers
+        self.last_decision = None
+
+    @property
+    def orchestrator(self):
+        if self._orchestrator is None:
+            from orchestrator import AgentOrchestrator
+            from utils import policy_client
+
+            self._orchestrator = AgentOrchestrator(
+                llm=self.llm,
+                analyze_intent=analyze_intent,
+                retrieve=rag.retrieve,
+                build_context=rag.build_context,
+                source_of=rag.source_of,
+                decide=policy_client.decide,
+                build_features=policy_client.build_features,
+                legacy_decision=policy_client.legacy_decision,
+                generate_explanation=generate_explanation,
+                index_info=rag.get_index_info,
+            )
+        return self._orchestrator
+
+    def _initial_decision(self, user_data):
+        """Policy decision for a first contact. The fetched data is endpoint-specific, so the
+        policy may only confirm the endpoint's action or defer the contact (wait)."""
+        from utils import policy_client
+
+        legacy = policy_client.legacy_decision(user_data)
+        data = user_data.get("data") or {}
+        return policy_client.decide(
+            str(data.get("user_id")), policy_client.build_features(user_data), legacy,
+            allowed_actions=[legacy, "wait"],
+        )
 
     def agent_initiate(self, user_data) -> str:
         """Premier message avec prompts spécialisés selon le scénario business"""
@@ -51,6 +88,19 @@ class SalesAgent:
         print(f"[agent main]: Extracted product name: {product_name}")
         print(f"[agent main]: Business strategy: {endpoint_strategy}")
         print(f"[agent main]: Recommended action: {recommended_action}")
+
+        decision = None
+        self.last_decision = None
+        if feature_flags.POLICY_MODE != "off":
+            from orchestrator import format_decision_block
+            from utils.policy_client import public_decision
+
+            decision = self._initial_decision(user_data)
+            self.last_decision = public_decision(decision)
+            if decision["mode"] == "active" and decision["action"] == "wait":
+                explanation = "Contact différé par la politique next-best-action.\n" + \
+                    format_decision_block(decision, [], None, rag.get_index_info())
+                return None, explanation, None
 
         # Generate RAG context based on the product
         rag_query = self.llm.query_small_rag_llm(product_name)
@@ -79,6 +129,10 @@ class SalesAgent:
         explanation = self._generate_scenario_explanation(
             endpoint_strategy, product_name, user_data["data"]
         )
+        if decision is not None:
+            from orchestrator import format_decision_block
+
+            explanation += format_decision_block(decision, [], None, rag.get_index_info())
 
         # Generate contextual subject line
         subject = self.llm.generate_mail_object(
@@ -160,6 +214,12 @@ Explication de génération — Stratégie générique
     def respond(self, user_message: str, user_data, conversation_history: str) -> str:
         """Répondre au client avec logique intent + infos manquantes"""
 
+        self.last_decision = None
+        if feature_flags.USE_ORCHESTRATOR:
+            state = self.orchestrator.invoke(user_message, user_data, conversation_history)
+            self.last_decision = state["decision"]
+            return state["response"], state["explanation"]
+
         intent = analyze_intent(user_message)
         strategy = SALES_STRATEGIES.get(intent["intention"]["label"])
         # Si infos manquantes → collect d’abord
@@ -224,6 +284,9 @@ def generate_initial_message(agent: "SalesAgent", user_data) -> str:
 
     # Step 1: Generate AI agent response
     response, explanation, subject = agent.agent_initiate(user_data)
+    if response is None:
+        print(f"⏸️  [generate_initial_message] Contact deferred: {explanation}")
+        return response, explanation, subject
 
     # Step 2: Create or get client from database
     print("\n[generate_initial_message] Creating/getting client from database...")
@@ -263,6 +326,7 @@ def generate_initial_message(agent: "SalesAgent", user_data) -> str:
         subject=subject,  # Generated subject
         conversation_status=conversation_status,
         argumentation=explanation,  # AI explanation for the response
+        decision=agent.last_decision,
     )
 
     if message_id and conversation_id:
@@ -360,6 +424,7 @@ def generate_response(agent: "SalesAgent") -> str:
         conversation_id=conversation["conversation_id"],
         subject=subject,
         argumentation=explanation,  # AI explanation for the response
+        decision=agent.last_decision,
     )
 
     if not message_id:

@@ -46,6 +46,9 @@ if __name__ == "__main__":
                 if user_data:
                     print("👤 Processing new user data - generating initial message...")
                     reply, explanation, subject = generate_initial_message(agent, user_data)
+                    if reply is None:
+                        print(f"⏸️  Initial contact deferred by policy:\n{explanation}")
+                        continue
                     print(
                         "=" * 60,
                         f"\n🚀 Initial Message Generated:",

@@ -13,3 +13,4 @@ kafka-data/.venv/
 mlruns/
 artifacts/
 mlops/state/
+mlflow_data/

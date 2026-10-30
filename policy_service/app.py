@@ -22,7 +22,10 @@ from fastapi.responses import PlainTextResponse
 
 from mlops.common.manifest import load_latest
 from mlops.common.schemas import (
-    ACTION_SCHEMA_VERSION, STATE_SCHEMA_VERSION, PolicyActRequest, PolicyActResponse,
+    ACTION_SCHEMA_VERSION,
+    STATE_SCHEMA_VERSION,
+    PolicyActRequest,
+    PolicyActResponse,
 )
 from mlops.common.storage import artifact_root
 from mlops.rl.actions import ACTIONS_V1, business_mask, reason_codes, restrict, rules_action

@@ -37,7 +37,7 @@ services:
     networks:
       - internal
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')" ]
       interval: 15s
       timeout: 10s
       retries: 5
@@ -51,8 +51,8 @@ services:
     environment:
       ME_CONFIG_MONGODB_SERVER: mongodb
       ME_CONFIG_MONGODB_PORT: 27017
-      ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: secret
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USER:-admin}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD:-secret}
     depends_on:
       - mongodb
     networks:
@@ -61,7 +61,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver
     environment:
-      SA_PASSWORD: "YourStrong!Passw0rd"
+      SA_PASSWORD: "${MSSQL_SA_PASSWORD:-YourStrong!Passw0rd}"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
@@ -72,8 +72,8 @@ services:
     image: sqlpad/sqlpad:latest
     container_name: sqlpad
     environment:
-      SQLPAD_ADMIN: "admin"
-      SQLPAD_ADMIN_PASSWORD: "admin123"
+      SQLPAD_ADMIN: "${SQLPAD_ADMIN:-admin}"
+      SQLPAD_ADMIN_PASSWORD: "${SQLPAD_ADMIN_PASSWORD:-admin123}"
     ports:
       - "3000:3000"
     restart: unless-stopped

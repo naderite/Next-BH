@@ -10,7 +10,10 @@ if REPO_ROOT not in sys.path:
     sys.path.append(REPO_ROOT)
 
 from mlops.common.events import (  # noqa: E402
-    OUTBOX_COLLECTION, EventPublisher, decision_made_event, kafka_producer,
+    OUTBOX_COLLECTION,
+    EventPublisher,
+    decision_made_event,
+    kafka_producer,
 )
 
 _publisher = None

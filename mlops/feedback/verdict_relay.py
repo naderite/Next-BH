@@ -22,8 +22,12 @@ import time
 from datetime import datetime, timezone
 from typing import Optional
 
-from mlops.common.events import EventPublisher, admin_verdict_event, kafka_producer
-from mlops.common.events import OUTBOX_COLLECTION
+from mlops.common.events import (
+    OUTBOX_COLLECTION,
+    EventPublisher,
+    admin_verdict_event,
+    kafka_producer,
+)
 
 log = logging.getLogger("verdict_relay")
 

@@ -1,0 +1,31 @@
+[project]
+name = "next-bh"
+version = "2.0.0"
+description = "Next-BH 2.0: agent commercial, pipelines MLOps (Data & RAG, RL) et policy-service"
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+include = ["mlops*", "policy_service*"]
+
+[tool.pytest.ini_options]
+testpaths = ["agent/tests", "mlops/tests", "policy_service/tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["web", "BH-Assurance.git", "pipeline"]
+
+[tool.ruff.lint]
+# Only the new MLOps code is held to the lint gate; legacy modules are linted for errors only
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"agent/*.py" = ["F403", "F405", "I"]
+"agent/utils/*.py" = ["F403", "F405", "I", "E722", "F401", "F811", "F841"]
+"agent/rag_model/*.py" = ["F403", "F405", "I", "F401"]
+"agent/intent_analysis/*.py" = ["F403", "F405", "I"]
+"api_datasets/*.py" = ["I", "F401"]
+"test_*.py" = ["I", "F401", "E402", "F841", "E722"]
+"agent/test_*.py" = ["I", "F401", "E402", "F841", "E722"]

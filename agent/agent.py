@@ -2,6 +2,7 @@ from utils.llm_utils import LLM
 import gc
 
 import feature_flags
+from utils.event_publisher import publish_decision
 
 from utils.general_utils import *
 from utils.endpoint_utils import (
@@ -330,6 +331,7 @@ def generate_initial_message(agent: "SalesAgent", user_data) -> str:
     )
 
     if message_id and conversation_id:
+        publish_decision(agent.last_decision, conversation_id, message_id)
         print(f"✅ [generate_initial_message] Successfully created:")
         print(f"   Message ID: {message_id}")
         print(f"   Conversation ID: {conversation_id}")
@@ -432,6 +434,7 @@ def generate_response(agent: "SalesAgent") -> str:
         return None, "Failed to save response"
 
     print(f"✅ [generate_response] Agent response saved: {message_id}")
+    publish_decision(agent.last_decision, conversation_id, message_id)
 
     # Step 6: Update conversation status from 'open' to 'pending'
     print(

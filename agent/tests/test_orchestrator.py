@@ -117,3 +117,22 @@ def test_compliance_flags_ungrounded_figures_and_promises():
     assert not bad["passed"]
     assert "absolute_guarantee" in bad["issues"] and "no_supporting_sources" in bad["issues"]
     assert any(i.startswith("unsupported_figure") for i in bad["issues"])
+
+
+def test_decision_event_only_published_when_flag_on(monkeypatch):
+    from utils import event_publisher
+
+    published = []
+
+    class Publisher:
+        def publish(self, event):
+            published.append(event)
+            return True
+
+    decision = {"decision_id": "d-9", "action": "wait", "model_version": "rl-1", "trace_id": "t"}
+    monkeypatch.setattr(feature_flags, "PUBLISH_EVENTS", False)
+    assert not event_publisher.publish_decision(decision, "c1", "m1", Publisher())
+    monkeypatch.setattr(feature_flags, "PUBLISH_EVENTS", True)
+    assert event_publisher.publish_decision(decision, "c1", "m1", Publisher())
+    assert published[0].event_type == "decision_made" and published[0].message_id == "m1"
+    assert not event_publisher.publish_decision(None, "c1", "m1", Publisher())

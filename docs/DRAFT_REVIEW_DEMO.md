@@ -27,4 +27,6 @@ env -i PATH="$PATH" "$review_python" -B scripts/demo_recommendation.py
 
 The recommendation demo should select `Synthetic Fleet Cover` and show `pending`. The review demo then prints `validated` for `synthetic-approver` and `rejected` for `synthetic-rejecter`, each with the recorded UTC timestamp. For each draft it tries a second decision, rereads the record to confirm the original fields, and reports `Outbound requests: 0`. The decision checks also verify that two competing reviewers have exactly one winner.
 
-The review demo allows connections only to the disposable database. It uses synthetic fixtures and the agent demo's model and storage substitutes. GitHub Actions runs the same checks with a temporary MongoDB service. These commands exercise the decision flow at the storage boundary. Dashboard verification is tracked in [BH-10](https://maiteai.atlassian.net/browse/BH-10).
+The review demo allows connections only to the disposable database. It uses synthetic fixtures and the agent demo's model and storage substitutes. GitHub Actions runs the same checks with a temporary MongoDB service.
+
+The [historical dashboard pilot](../web/review-pilot/README.md) documents the browser walkthrough. The dashboard CI job signs in, opens both synthetic drafts, checks the recorded decisions after reload, and verifies that the API returns a conflict on a second decision. It also checks that the email endpoint is unavailable and records any browser request outside the pilot origin. [BH-10 integration](https://maiteai.atlassian.net/browse/BH-10)

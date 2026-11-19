@@ -105,6 +105,8 @@ The platform is composed of several tightly integrated subsystems:
 
 ## Deployment & Operations
 
+For a local walkthrough with synthetic data, see the [company recommendation demo](docs/RECOMMENDATION_DEMO.md).
+
 ### Prerequisites
 
 - Python 3.11+

@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -ne 1 ]]; then
-  echo 'Usage: bash scripts/run_dashboard_review_pilot.sh PATH_TO_DEMO_PYTHON' >&2
+if [[ $# -ne 1 && ${2:-} != --staging ]]; then
+  echo 'Usage: bash scripts/run_dashboard_review_pilot.sh PYTHON [--staging REVIEWER_EMAIL GENERATOR_OPTIONS...]' >&2
   exit 2
+fi
+
+staging=false
+if [[ ${2:-} == --staging ]]; then
+  staging=true
+  reviewer_email=${3:?Provide the pilot reviewer email}
 fi
 
 review_python=$(cd -- "$(dirname -- "$1")" && pwd)/$(basename -- "$1")
@@ -29,11 +35,15 @@ trap 'exit 143' TERM
 
 python3.12 -B "$repo_root/scripts/prepare_dashboard_snapshot.py" "$review_source"
 git -C "$review_source" apply "$repo_root/web/review-pilot/dashboard.patch"
+if "$staging"; then
+  git -C "$review_source" apply "$repo_root/web/review-pilot/staging.patch"
+fi
 npm --prefix "$review_source/backend" ci --ignore-scripts --no-audit --no-fund
 npm --prefix "$review_source/frontend" ci --ignore-scripts --no-audit --no-fund
 "$review_source/backend/node_modules/.bin/tsc" -p "$review_source/backend/tsconfig.pilot.json" --noEmitOnError
 env -i PATH="$PATH" VITE_DRAFT_REVIEW_PILOT=true npm --prefix "$review_source/frontend" run build
 
+if ! "$staging"; then
 env -i PATH="$PATH" PYTHONPATH="$repo_root/scripts" "$review_python" -B - "$review_work/draft.json" <<'PY'
 import json
 import sys
@@ -48,6 +58,7 @@ Path(sys.argv[1]).write_text(json.dumps({
     'subject': draft['subject'], 'body': draft['corps'],
 }))
 PY
+fi
 
 review_mongo=$(docker run --rm -d -p 127.0.0.1::27017 mongo:7.0@sha256:884c055bff8b7144ca44830d01826facd3083b33c4dea44b94a1476c62de3c32)
 for attempt in $(seq 1 30); do
@@ -57,7 +68,13 @@ for attempt in $(seq 1 30); do
   sleep 1
 done
 review_port=$(docker port "$review_mongo" 27017/tcp | cut -d: -f2)
-env -i PATH="$PATH" node "$review_source/backend/dist/pilot-review.js" \
-  "$review_port" "$review_work/draft.json" "$review_source/frontend/dist" &
+launch_args=("$review_port" "$review_work/draft.json" "$review_source/frontend/dist")
+if "$staging"; then
+  db_name=$("$review_python" -B -c 'from secrets import token_hex; print("bh_review_stage_" + token_hex(12))')
+  env -i PATH="$PATH" "$review_python" -B "$repo_root/scripts/run_staging_recommendations.py" \
+    --mongo-port "$review_port" --db "$db_name" "${@:4}"
+  launch_args=("$review_port" --staging "$review_source/frontend/dist" "$db_name" "$reviewer_email")
+fi
+env -i PATH="$PATH" node "$review_source/backend/dist/pilot-review.js" "${launch_args[@]}" &
 review_server=$!
 wait "$review_server"

@@ -1,4 +1,4 @@
-# Historical dashboard pilot proposal
+# Wave 2 dashboard pilot
 
 This pilot uses the [historical dashboard source](../../docs/DASHBOARD_SOURCE.md). It reuses the existing React layout, Express authentication, and MongoDB message model. A loopback-only Express entry point serves the review page and stores decisions in disposable MongoDB.
 

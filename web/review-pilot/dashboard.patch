@@ -1,5 +1,5 @@
 diff --git a/backend/src/models/message.model.ts b/backend/src/models/message.model.ts
-index 9d9bea9..9f67901 100644
+index 9d9bea9..687bc95 100644
 --- a/backend/src/models/message.model.ts
 +++ b/backend/src/models/message.model.ts
 @@ -7,7 +7,9 @@ export interface IMessage extends Document {
@@ -11,22 +11,22 @@ index 9d9bea9..9f67901 100644
 +  reviewed_by?: string;
 +  reviewed_at?: Date;
    is_client_response: boolean;
-   is_modified: boolean;
+   is_modified: boolean; 
    created_at: Date;
 @@ -42,10 +44,12 @@ const MessageSchema = new Schema<IMessage>({
    },
-   status: {
-     type: String,
+   status: { 
+     type: String, 
 -    enum: ['open', 'pending', 'validated', 'sent', 'blocked'], 
 +    enum: ['open', 'pending', 'validated', 'rejected', 'sent', 'blocked'],
      default: 'open',
-     required: true
+     required: true 
    },
 +  reviewed_by: { type: String },
 +  reviewed_at: { type: Date },
-   is_client_response: {
-     type: Boolean,
-     default: false
+   is_client_response: { 
+     type: Boolean, 
+     default: false 
 diff --git a/backend/src/pilot-review.ts b/backend/src/pilot-review.ts
 new file mode 100644
 index 0000000..3035e8b
@@ -200,6 +200,13 @@ index 713ead8..8a47da0 100644
                  <SidebarMenuItem key={item.title}>
                    <SidebarMenuButton asChild className="text-white hover:bg-white/10 hover:text-white">
                      <NavLink 
+@@ -84,4 +84,4 @@ export function DashboardSidebar() {
+       </SidebarContent>
+     </Sidebar>
+   )
+-}
+\ No newline at end of file
++}
 diff --git a/frontend/src/pages/PilotLogin.tsx b/frontend/src/pages/PilotLogin.tsx
 new file mode 100644
 index 0000000..04ef2ef

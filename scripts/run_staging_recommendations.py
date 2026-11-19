@@ -19,7 +19,6 @@ from staging_inputs import (
     ROOT,
     fetch_opportunity,
     load_catalog,
-    local_embeddings,
     local_gemma,
     opportunity_api,
 )
@@ -32,11 +31,6 @@ FIXTURES = ROOT / "scripts" / "fixtures"
 
 class EvaluationCase(Opportunity):
     expected: Outcome
-
-
-def ci_embeddings(texts):
-    """Provide deterministic vectors to a real Chroma collection in CI."""
-    return [list(hashlib.sha256(text.encode()).digest()[:16]) for text in texts]
 
 
 def ci_select_sources(prompt):
@@ -95,7 +89,7 @@ def main():
     parser.add_argument("--catalog-sha256")
     parser.add_argument("--ollama-url", default="http://127.0.0.1:11434")
     parser.add_argument("--ollama-digest")
-    parser.add_argument("--ci", action="store_true", help="Use deterministic embedding and inference substitutes")
+    parser.add_argument("--ci", action="store_true", help="Use deterministic model responses")
     args = parser.parse_args()
     if not 1 <= args.mongo_port <= 65535 or not re.fullmatch(r"bh_review_stage_[0-9a-f]{24}", args.db):
         parser.error("A disposable dashboard MongoDB port and database name are required")
@@ -111,7 +105,6 @@ def main():
         catalog_digest = hashlib.sha256(catalog_path.read_bytes()).hexdigest()
         model = RunnableLambda(ci_select_sources)
         model_info = {"name": "deterministic CI source selection"}
-        embed = ci_embeddings
         blocked = restrict_connections(ports)
     else:
         from urllib.parse import urlsplit
@@ -123,10 +116,9 @@ def main():
         ports.add(("127.0.0.1", urlsplit(args.ollama_url).port))
         blocked = restrict_connections(ports)
         model, model_info = local_gemma(args.ollama_url, args.ollama_digest)
-        embed = local_embeddings()
 
     catalog = load_catalog(catalog_path, catalog_digest)
-    index = CatalogIndex(catalog, embed)
+    index = CatalogIndex(catalog)
     outcomes = Counter()
     matches = 0
     with MongoClient(

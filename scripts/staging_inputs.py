@@ -2,7 +2,10 @@
 
 import csv
 import hashlib
+import math
+import re
 import sys
+import unicodedata
 from contextlib import chdir, contextmanager
 from pathlib import Path
 from runpy import run_path
@@ -114,18 +117,20 @@ def fetch_opportunity(api, opportunity):
 class CatalogIndex:
     """Index a single catalog in process and return evidence for the API candidate."""
 
-    def __init__(self, catalog, embed):
+    def __init__(self, catalog):
         import chromadb
         from chromadb.config import Settings
 
         self.revision = catalog.revision
-        self.embed = embed
         client = chromadb.EphemeralClient(settings=Settings(anonymized_telemetry=False))
         catalog_key = hashlib.sha256(catalog.model_dump_json().encode()).hexdigest()[:24]
         self.collection = client.get_or_create_collection(
             f"pilot-{catalog_key}", embedding_function=None
         )
-        texts = [f"{entry.product}\n{entry.excerpt}" for entry in catalog.entries]
+        texts = [
+            f"{entry.product}\n{entry.excerpt}\n{' '.join(entry.supports)}"
+            for entry in catalog.entries
+        ]
         self.collection.upsert(
             ids=[entry.id for entry in catalog.entries],
             documents=[entry.excerpt for entry in catalog.entries],
@@ -138,12 +143,12 @@ class CatalogIndex:
                 }
                 for entry in catalog.entries
             ],
-            embeddings=embed(texts),
+            embeddings=[catalog_vector(text) for text in texts],
         )
 
     def search(self, product, activity, needs):
         results = self.collection.query(
-            query_embeddings=self.embed([f"{product}\n{activity}\n{' '.join(needs)}"]),
+            query_embeddings=[catalog_vector(f"{product}\n{activity}\n{' '.join(needs)}")],
             where={"product": product},
             n_results=8,
             include=["documents", "metadatas"],
@@ -164,20 +169,17 @@ class CatalogIndex:
         ]
 
 
-def local_embeddings():
-    from chromadb.utils.embedding_functions import ONNXMiniLM_L6_V2
-
-    encoder = ONNXMiniLM_L6_V2()
-    # Chroma downloads this bundle on first use if missing. Pilot runs use the
-    # locally provisioned bundle so inference makes no download requests.
-    directory = encoder.DOWNLOAD_PATH / encoder.EXTRACTED_FOLDER_NAME
-    artifacts = (
-        "config.json", "model.onnx", "special_tokens_map.json", "tokenizer_config.json",
-        "tokenizer.json", "vocab.txt",
-    )
-    if any(not (directory / name).is_file() for name in artifacts):
-        raise RuntimeError(f"Provision Chroma's embedding model locally at {directory}")
-    return lambda texts: [vector.tolist() for vector in encoder(texts)]
+def catalog_vector(text):
+    """Embed the small product catalog with normalized lexical features."""
+    normalized = unicodedata.normalize("NFKD", text.casefold())
+    folded = "".join(character for character in normalized if not unicodedata.combining(character))
+    vector = [0.0] * 512
+    for term in set(re.findall(r"[^\W_]+", folded)):
+        digest = hashlib.blake2b(term.encode(), digest_size=4).digest()
+        position = int.from_bytes(digest, "big") % len(vector)
+        vector[position] += 1.0
+    length = math.sqrt(sum(weight * weight for weight in vector))
+    return [weight / length for weight in vector] if length else vector
 
 
 def local_gemma(base_url, expected_digest):

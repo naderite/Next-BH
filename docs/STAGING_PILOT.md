@@ -53,6 +53,8 @@ CI uses FastAPI, real Chroma retrieval, disposable MongoDB, and Chromium. It sub
 
 | Evidence | Cases and observed outcomes |
 | --- | --- |
-| Automated | See CI and final pilot verification record. |
-| Actual staging | Capture the launcher summary and browser outcomes for the pinned catalog and model. |
-| Human review | Record the authorized reviewer, date, number of scored cases, fit/grounding/usability totals, and observed failure examples. Keep these scores separate from automated matches. |
+| Automated | [Wave 3 staging CI](https://github.com/naderite/Next-BH/actions/runs/44635747668) passed on `1d675b2`: 24/24 expected outcomes (8 recommendations, 8 clarification requests, 8 insufficient-evidence notes), with deterministic inference. |
+| Actual staging | Pending. Capture the launcher summary and browser outcomes for the pinned catalog and model on a host with `gemma3n:e4b` available. |
+| Human review | Pending. Record the authorized reviewer's date, case count, fit, grounding, and usability totals, plus examples for any scores below 2. |
+
+[BH-12](https://maiteai.atlassian.net/browse/BH-12) tracks the milestone. Review and merge [BH-15](https://github.com/naderite/Next-BH/pull/11) before [BH-16](https://github.com/naderite/Next-BH/pull/12). Run actual staging from clean `master` and record the model digest, results, and human scores in [BH-16](https://maiteai.atlassian.net/browse/BH-16).

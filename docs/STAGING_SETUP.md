@@ -18,12 +18,7 @@ curl --fail --silent http://127.0.0.1:11434/api/tags
 curl --fail --silent http://127.0.0.1:11434/api/version
 ```
 
-Pre-provision Chroma's ONNX MiniLM embedding bundle from the Chroma package's distribution endpoint during environment setup. This one-time command downloads and verifies the bundle. The pilot checks that all files are present and disables Chroma telemetry. Staging uses a dedicated in-process collection and never connects to the existing shared `legal_docs` service.
-
-```sh
-../.next-bh-wave3-venv/bin/python -B -c \
-  'from chromadb.utils.embedding_functions import ONNXMiniLM_L6_V2; ONNXMiniLM_L6_V2()(["provisioning check"])'
-```
+The pilot uses Chroma for vector indexing and retrieval. It builds normalized lexical vectors from product names, excerpts, need codes, and the synthetic opportunity context. This keeps staging reproducible without downloading a second model. Chroma runs in process with telemetry disabled and uses a dedicated collection.
 
 The catalog is a JSON object with a `revision` and an `entries` array. Each entry contains a unique `id`, the exact API `product` name, `document` and `locator` fields, the verbatim `excerpt`, and `supports` codes for the needs that the excerpt substantiates. Keep enough surrounding text to preserve qualifications. The pilot requires the approved SHA-256 of the catalog file. Use an approved catalog whose excerpts can be shown in the pilot dashboard.
 

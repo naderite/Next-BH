@@ -53,8 +53,8 @@ CI uses FastAPI, real Chroma retrieval, disposable MongoDB, and Chromium. It sub
 
 | Evidence | Cases and observed outcomes |
 | --- | --- |
-| Automated | [Wave 3 staging CI](https://github.com/naderite/Next-BH/actions/runs/44635747668) passed on `1d675b2`: 24/24 expected outcomes (8 recommendations, 8 clarification requests, 8 insufficient-evidence notes), with deterministic inference. |
-| Actual staging | Pending. Capture the launcher summary and browser outcomes for the pinned catalog and model on a host with `gemma3n:e4b` available. |
+| Automated | [Wave 3 staging CI on master](https://github.com/naderite/Next-BH/actions/runs/44643141739/attempts/2) passed on `4bfca36`: 24/24 expected outcomes (8 recommendations, 8 clarification requests, 8 insufficient-evidence notes) and zero outbound customer messages. The model responses were deterministic. |
+| Actual staging | On hold pending a suitable host. Capture the launcher summary and browser outcomes for the pinned catalog and model on a host with `gemma3n:e4b` available. |
 | Human review | Pending. Record the authorized reviewer's date, case count, fit, grounding, and usability totals, plus examples for any scores below 2. |
 
-[BH-12](https://maiteai.atlassian.net/browse/BH-12) tracks the milestone. Review and merge [BH-15](https://github.com/naderite/Next-BH/pull/11) before [BH-16](https://github.com/naderite/Next-BH/pull/12). Run actual staging from clean `master` and record the model digest, results, and human scores in [BH-16](https://maiteai.atlassian.net/browse/BH-16).
+[BH-12](https://maiteai.atlassian.net/browse/BH-12) tracks the milestone. The [dashboard integration](https://github.com/naderite/Next-BH/pull/11), [staging implementation](https://github.com/naderite/Next-BH/pull/12), and [CI and checkout fixes](https://github.com/naderite/Next-BH/pull/13) are merged. Run actual staging from clean `master` and record the commit, model digest, results, and human scores in [BH-16](https://maiteai.atlassian.net/browse/BH-16). The [project progress record](AVANCEMENT.md) links the remaining acceptance evidence.

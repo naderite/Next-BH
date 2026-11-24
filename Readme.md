@@ -2,6 +2,8 @@
 
 Le [suivi d’avancement de Next-BH](docs/AVANCEMENT.md) décrit le périmètre livré, l’architecture du pilote de recommandation, les preuves Jira et GitHub, et les travaux restants. Le [prompt du rapport en français](docs/PROMPT_RAPPORT_AVANCEMENT.md) précise les fichiers à produire et les captures à réunir.
 
+Le périmètre MLOps et RL de Next-BH 2.0 (pipelines Data & RAG et RL, policy-service, boucle d’événements), activable par feature flags, est décrit dans [docs/nextbh2/](docs/nextbh2/RUNBOOK.md) : [audit](docs/nextbh2/AUDIT.md), [exploitation](docs/nextbh2/RUNBOOK.md) et [intégration au dashboard](docs/nextbh2/INTEGRATION.md).
+
 ## Executive Summary
 
 **Next Deal** is a modular, AI-driven insurance sales and client engagement platform for BH Assurance. It leverages state-of-the-art conversational AI, retrieval-augmented generation (RAG), intent analysis, and multi-channel integration (web, email, Kafka) to automate, personalize, and streamline client interactions, product recommendations, and operational workflows.

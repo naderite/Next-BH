@@ -1,8 +1,18 @@
 # Next-BH 2.0 — Intégration backend Node et dashboard (PR 6)
 
-Le code de `web/BH-Assurance` (backend Express + frontend React) n'est pas présent dans ce dépôt
-(gitlink sans `.gitmodules`, voir `AUDIT.md` §4). La boucle de feedback fonctionne donc **sans
-modifier le backend**, et ce document décrit les deux évolutions optionnelles à faire côté web.
+Le gitlink `web/BH-Assurance` pointe sur une révision indisponible. Depuis la vague 2 de `master`,
+le dashboard est reconstruit hors du dépôt à partir de la révision `a18e1e0` et des correctifs
+`web/review-pilot/dashboard.patch` et `staging.patch` (`docs/DASHBOARD_SOURCE.md`,
+`scripts/run_dashboard_review_pilot.sh`). La boucle de feedback fonctionne **sans modifier ce
+code** ; ce document décrit les évolutions optionnelles côté web.
+
+### Raccordement avec le pilote de revue (vagues 2 et 3)
+
+| Pilote `master` | Next-BH 2.0 (cette branche) |
+|---|---|
+| Décision admin : `status` + `reviewed_by` + `reviewed_at` dans la même écriture (Express ou `agent/utils/draft_review.py`) | `verdict_relay` lit ces champs ; `reviewed_at` devient l'horodatage de l'événement `admin_verdict`, l'identité du relecteur n'est pas copiée dans Kafka |
+| Brouillons du lanceur : `recommendation_outcome`, `recommendation_product`, `recommendation_sources`, `catalog_revision` | Les messages de l'agent portent `decision` (action, version de modèle, sources RAG, conformité) et `argumentation`. Ils n'ont pas de `decision.decision_id` côté pilote : le relais les ignore |
+| L'écran **Validation** du pilote n'affiche que `subject`, `body`, statut, relecteur et champs `recommendation_*` | Pour y voir la décision RL, étendre `staging.patch` avec les champs du §3 ci-dessous. Les sources RAG de l'agent ne sont pas des extraits vérifiés au sens du pilote : ne pas les écrire dans `recommendation_sources` |
 
 ## 1. Ce qui fonctionne déjà sans toucher au web
 

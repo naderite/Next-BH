@@ -109,3 +109,20 @@ def test_relay_publishes_each_verdict_once():
 
     rows = join_decisions(dedupe([decision_made_event(DECISION, "c1", "m1").model_dump(), event]))
     assert rows[0]["action"] == "recommend_product" and rows[0]["admin_verdict"] == "edited"
+
+
+def test_relay_uses_review_timestamp_from_draft_review():
+    from datetime import datetime, timezone
+
+    reviewed = datetime(2026, 11, 20, 9, 30, tzinfo=timezone.utc)
+    # shape written by agent/utils/draft_review.record_draft_decision and the review pilot
+    messages = FakeCollection([{
+        "_id": "m1", "status": "validated", "reviewed_by": "reviewer-1", "reviewed_at": reviewed,
+        "updated_at": datetime(2026, 11, 21, tzinfo=timezone.utc), "decision": DECISION,
+    }])
+    producer = FakeProducer()
+    relay_verdicts(messages, EventPublisher(FakeCollection(), "decision_events", producer))
+    event = producer.sent[0][2]
+    assert event["admin_verdict"] == "approved"
+    assert event["timestamp"] == reviewed.isoformat()
+    assert "reviewer-1" not in str(event)  # reviewer identity stays out of the event stream

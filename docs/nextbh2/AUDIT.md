@@ -39,9 +39,11 @@ l'endpoint (au hasard côté agent) et `recommended_action` (règle de seuil sur
 | `conversations` | `client_id`, `status` (nouvelle_opportunite, renouvellement, payment_facture, upsell_cross_sell), `conversation_status` (open/pending), `is_completed`, `started_at`, `last_activity_at` |
 | `messages` | `conversation_id`, `sender` (client/ai/agent), `direction`, `subject`, `body`, `status` (pending/validated/rejected), `is_modified`, `argumentation`, `created_at` |
 
-Le passage `pending → validated/rejected` (verdict admin) est effectué par le backend Node,
-**absent du dépôt** (voir §4). `argumentation` est le champ affiché au dashboard : la PR 5 y ajoute
-action, justification, version de modèle et sources sans modifier le frontend.
+Le passage `pending → validated/rejected` (verdict admin) est effectué par le backend Node
+(voir §4). Depuis la vague 2 de `master`, la même écriture enregistre `reviewed_by` et
+`reviewed_at` (`agent/utils/draft_review.py`, pilote `web/review-pilot`). `argumentation` est le
+champ affiché par le dashboard historique : la PR 5 y ajoute action, justification, version de
+modèle et sources sans modifier le frontend.
 
 ## 3. Contrats existants conservés
 
@@ -56,7 +58,7 @@ action, justification, version de modèle et sources sans modifier le frontend.
 
 | # | Constat | Traitement |
 |---|---|---|
-| 1 | `web/BH-Assurance` est un gitlink sans `.gitmodules` : backend et frontend non récupérables depuis ce dépôt | Verdict admin publié côté Python par `mlops/feedback/verdict_relay.py` (lit les changements de statut des messages) ; snippet backend fourni dans `docs/nextbh2/INTEGRATION.md` |
+| 1 | `web/BH-Assurance` pointe sur `394df01`, indisponible en amont. Depuis `master` (BH-8/BH-17), `.gitmodules` est déclaré et le dashboard est reconstruit à partir de la révision `a18e1e0` + `web/review-pilot/*.patch` (`docs/DASHBOARD_SOURCE.md`) | Verdict admin publié côté Python par `mlops/feedback/verdict_relay.py` (lit les changements de statut des messages, horodatage `reviewed_at`) ; snippet backend fourni dans `docs/nextbh2/INTEGRATION.md` |
 | 2 | `rag.py` : `logger.exception("…" + e)` lève `TypeError` dans le `except` | Corrigé en PR 3 |
 | 3 | `/recommend_pm/` renvoie le meilleur score **global** du CSV et des noms aléatoires | Endpoint `/features/{endpoint_key}/{ref}` ajouté (PR 3/5), endpoints existants inchangés |
 | 4 | `generate_response` code en dur `endpoint_strategy="product_recommendation"` et `produits_recommandes=AUTOMOBILE` | Conservé en legacy ; le graphe reconstruit l'état à partir du profil disponible |

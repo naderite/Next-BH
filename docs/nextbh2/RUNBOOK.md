@@ -17,8 +17,17 @@ mlops/
 policy_service/  FastAPI /policy/act, /health, /policy/reload, /metrics + Dockerfile
 agent/orchestrator.py, agent/compliance.py, agent/feature_flags.py,
 agent/utils/policy_client.py, agent/utils/event_publisher.py
-docker-compose.mlops.yaml, dvc.yaml, .github/workflows/{ci,mlops}.yml, scripts/smoke_test.py
+docker-compose.mlops.yaml, dvc.yaml, .github/workflows/{ci,mlops}.yml, scripts/smoke_policy_service.py
 ```
+
+## Articulation avec le pilote de `master`
+
+Le pilote des vagues 1 à 3 (`docs/AVANCEMENT.md`, `docs/STAGING_PILOT.md`) couvre la
+recommandation PM avec sources vérifiées et la revue humaine ; il exclut volontairement le RL.
+Cette branche ajoute le périmètre MLOps / RL **derrière des feature flags désactivés par défaut** :
+le lanceur du pilote, `grounded_recommendation.py`, `draft_review.py` et les workflows
+`draft-review.yml` / `staging-pilot.yml` ne sont pas modifiés. Les deux CI coexistent :
+`ci.yml` et `mlops.yml` ne lintent ni ne testent les scripts du pilote.
 
 ## Installation
 
@@ -63,7 +72,7 @@ interdite, uplift relatif, graines gagnées, contacts par épisode, robustesse a
 
 ```bash
 docker compose -f docker-compose.yaml -f docker-compose.mlops.yaml up -d policy-service mlflow prometheus
-python scripts/smoke_test.py --url http://localhost:8010 --expect-model
+python scripts/smoke_policy_service.py --url http://localhost:8010 --expect-model
 ```
 
 ## Défaillances et rollback
@@ -89,7 +98,8 @@ jamais une promotion automatique.
 
 ## Limites connues
 
-- Backend Node et frontend React absents du dépôt : voir `INTEGRATION.md`.
+- Dashboard : seul le pilote reconstruit (`a18e1e0` + correctifs) est disponible ; il n'affiche
+  pas encore le champ `decision`. Voir `INTEGRATION.md`.
 - Aucune donnée réelle de conversion : `customer_outcome` défini mais non émis.
 - La première contact (`agent_initiate`) ne peut que confirmer l'action de l'endpoint ou différer
   le contact : les données récupérées sont propres à l'endpoint tiré.

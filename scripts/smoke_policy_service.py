@@ -1,7 +1,7 @@
 """
 Post-deployment smoke test of the policy-service.
 
-    python scripts/smoke_test.py --url http://localhost:8010 [--expect-model]
+    python scripts/smoke_policy_service.py --url http://localhost:8010 [--expect-model]
 
 Checks health, a decision with a trace id, the business mask (fatigued customer → wait)
 and the metrics endpoint. Exit code 1 on any failure.

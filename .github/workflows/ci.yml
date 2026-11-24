@@ -6,9 +6,10 @@ on:
   pull_request:
 
 env:
-  # lint gate covers the Next-BH 2.0 code; legacy modules are not reformatted
+  # lint gate covers the Next-BH 2.0 MLOps code; legacy modules and the pilot scripts
+  # (checked by draft-review.yml / staging-pilot.yml) are not reformatted
   LINT_PATHS: >-
-    mlops policy_service scripts agent/orchestrator.py agent/compliance.py
+    mlops policy_service scripts/smoke_policy_service.py agent/orchestrator.py agent/compliance.py
     agent/feature_flags.py agent/utils/policy_client.py agent/utils/event_publisher.py agent/tests
 
 jobs:
@@ -60,6 +61,6 @@ jobs:
         run: |
           docker run -d --name policy -p 8010:8010 next-bh/policy-service:${{ github.sha }}
           for i in $(seq 1 30); do curl -sf localhost:8010/health && break; sleep 2; done
-          python scripts/smoke_test.py --url http://localhost:8010
+          python scripts/smoke_policy_service.py --url http://localhost:8010
       - if: always()
         run: docker logs policy || true

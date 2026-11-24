@@ -1,0 +1,23 @@
+schema: '2.0'
+stages:
+  profile_source_workbooks:
+    cmd: python -B scripts/profile_source_workbooks.py
+    deps:
+    - path: scripts/profile_source_workbooks.py
+      hash: md5
+      md5: 996e3a66710847c28b62be867712b3c0
+      size: 4168
+    - path: scripts/source-dvc-requirements.txt
+      hash: md5
+      md5: 8e7b03b1bb8f9a5e1f135273e77460d1
+      size: 28
+    - path: source_inputs/workbooks
+      hash: md5
+      md5: 05c3560aad442e923fdc1eb0c2f19e9b.dir
+      size: 15114561
+      nfiles: 3
+    outs:
+    - path: data/source-quality.json
+      hash: md5
+      md5: e74186a277aac8f01ac584e5bc1fedc8
+      size: 1461

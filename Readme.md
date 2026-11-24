@@ -2,6 +2,8 @@
 
 Le [suivi d’avancement de Next-BH](docs/AVANCEMENT.md) décrit le périmètre livré, l’architecture du pilote de recommandation, les preuves Jira et GitHub, et les travaux restants. Le [prompt du rapport en français](docs/PROMPT_RAPPORT_AVANCEMENT.md) précise les fichiers à produire et les captures à réunir.
 
+Le [guide de préparation des données source](docs/SOURCE_DATA_DVC.md) décrit le contrôle local des classeurs d’assurance d’origine avec DVC.
+
 ## Executive Summary
 
 **Next Deal** is a modular, AI-driven insurance sales and client engagement platform for BH Assurance. It leverages state-of-the-art conversational AI, retrieval-augmented generation (RAG), intent analysis, and multi-channel integration (web, email, Kafka) to automate, personalize, and streamline client interactions, product recommendations, and operational workflows.

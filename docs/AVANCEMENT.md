@@ -15,6 +15,10 @@ Les vagues 1 et 2 sont terminées dans Jira. La vague 3 est intégrée à `maste
 
 Les PR #1 à #13 étaient fusionnées dans `master` au point de référence `4bfca3682be42a1f52011a7111d648ed9f83553e`. Jira conserve le détail des revues et des critères d’acceptation. La revue technique et la fusion des PR #11 à #13 ont été effectuées sous la direction de Mohamed Kallel. La notation humaine du pilote reste à consigner. [Commit de référence](https://github.com/naderite/Next-BH/commit/4bfca3682be42a1f52011a7111d648ed9f83553e), [revue BH-16](https://maiteai.atlassian.net/browse/BH-16)
 
+La [PR #14](https://github.com/naderite/Next-BH/pull/14) a publié le suivi et le prompt du rapport à la révision `7173a27`. La livraison est consignée dans [BH-19](https://maiteai.atlassian.net/browse/BH-19). La [PR #15](https://github.com/naderite/Next-BH/pull/15), consacrée au rôle de Gemma, est encore en revue au 24 novembre 2026.
+
+[BH-18](https://maiteai.atlassian.net/browse/BH-18) suit la préparation locale des trois classeurs d’assurance d’origine pour P1. Le [guide DVC](SOURCE_DATA_DVC.md) couvre le versionnement des sources et le contrôle des liens entre assurés, contrats, garanties et sinistres. Le pilote déployable utilise ses jeux synthétiques.
+
 ## Partie de l’architecture couverte
 
 Le pilote part d’une opportunité d’assurance pour une personne morale (PM) et se termine par l’enregistrement d’une décision de revue interne.

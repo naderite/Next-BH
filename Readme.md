@@ -10,6 +10,8 @@ Le [suivi d’avancement de Next-BH](docs/AVANCEMENT.md) décrit le périmètre 
 
 ## System Architecture
 
+The [architecture and implementation inventory](docs/PROJECT_ARCHITECTURE.md) traces the original prototype, insurer workbooks, tested pilot, and academic RL and MLOps design.
+
 The platform is composed of several tightly integrated subsystems:
 
 - **AI Agent Orchestration:** Central logic for managing conversations, generating responses, and coordinating with other modules.

@@ -2,6 +2,7 @@ from langchain_ollama import OllamaLLM
 from langchain.prompts import PromptTemplate
 import gc
 from config import *
+from utils.recommendation_chain import product_recommendation_chain
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # -----------------------------
@@ -39,10 +40,6 @@ class LLM:
         # -----------------------------
         # Scenario-Specific Prompts
         # -----------------------------
-        self.product_recommendation_prompt = PromptTemplate(
-            input_variables=["user_data", "rag_context", "product_name"],
-            template=PRODUCT_RECOMMENDATION_PROMPT,
-        )
         self.payment_reminder_prompt = PromptTemplate(
             input_variables=["user_data", "rag_context", "product_name"],
             template=PAYMENT_REMINDER_PROMPT,
@@ -63,7 +60,7 @@ class LLM:
         self.initial_sales_chain = self.intitial_sales_prompt | self.llm
         
         # Scenario-specific chains
-        self.product_recommendation_chain = self.product_recommendation_prompt | self.llm
+        self.product_recommendation_chain = product_recommendation_chain(self.llm)
         self.payment_reminder_chain = self.payment_reminder_prompt | self.llm
         self.contract_renewal_chain = self.contract_renewal_prompt | self.llm
 

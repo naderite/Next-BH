@@ -24,7 +24,7 @@ Reviewed 24 November 2026, Africa/Tunis. The default-branch baseline is [`7173a2
 | SQLite research package | The earlier local package at `data-review/organized-data/insurance_data.sqlite` preserves raw rows, original workbook bytes, relationship views, and source exceptions. It is a derived artifact with source provenance. The app and Wave 3 launcher do not read it. |
 | Real-data recommendation prototypes | The supplied v2 archive contains `insurance_recommender_physique.py` and `insurance_recommender_morale.py`. They read Excel directly, combine TF-IDF text similarity with contract-based collaborative filtering using truncated SVD, and returned recommendations on the recorded sample checks. The PP prototype mixes customer categories in its contract matrix. Both have cold-start and identity-quality issues and lack held-out evaluation. The pilot does not import them. |
 | Legacy serving inputs | The FastAPI endpoints use six prepared files for PP/PM recommendations, invoices, and renewals. The active checkout lacks those files. Saved JSON outputs are examples. The historical API's identity enrichment generates contact and display fields over the input profile. |
-| Wave 3 fixtures | Checked-in fictional company cases and fictional catalog passages, introduced together in [`0a8c2dd`](https://github.com/naderite/Next-BH/commit/0a8c2dd9f75882fe24fddb3914442a5e5232e135). They were authored for controlled scenarios. No source sampling, augmentation, or anonymization of the original workbooks is part of this path. The adapter writes a two-row temporary CSV per case. |
+| Wave 3 fixtures | Checked-in fictional company cases and fictional catalog passages, introduced together in [`0a8c2dd`](https://github.com/naderite/Next-BH/commit/0a8c2dd9f75882fe24fddb3914442a5e5232e135). They were authored for controlled scenarios. No source sampling, augmentation, or anonymization of the original workbooks is part of this path. The adapter writes two temporary rows per case with the fixture's candidate and supplied scores of 90 and 25. This checks ranking and the API contract. Product selection quality needs its own evaluation. |
 | DVC inputs and output | `source_inputs/workbooks.dvc` pins the original workbook snapshot. `dvc.yaml` and `dvc.lock` define and record the read-only quality stage. `data/source-quality.json` contains aggregate counts and fingerprints. The data, report, cache, and machine-local filesystem store are local. GitHub carries code, docs, and DVC metadata. |
 
 The aggregate validation found 92 cached Excel errors, 1,068 contracts with no matching customer, 210 guarantee lines with no matching contract, and 3,091 repeated contract/guarantee groups. A usable projection needs reviewed product IDs and eligibility, a declared date for time-based features, retained unknowns, and separate claim and coverage aggregates to prevent join duplication. The supplied materials provide no dated recommendation-exposure and customer-response trajectories for measuring policy rewards. The source data can inform portfolio and profile distributions for a simulator. [DVC evidence](https://github.com/naderite/Next-BH/pull/16)
@@ -35,7 +35,7 @@ The fictional fixtures make the expected recommendation, clarification, and abst
 
 ```mermaid
 flowchart LR
-    F[Company test case] --> A[FastAPI scores temporary CSV]
+    F[Company test case] --> A[FastAPI ranks supplied CSV scores]
     A --> C[Candidate]
     D[Fictional catalog with verified hash] --> R[Chroma lexical retrieval]
     C --> R

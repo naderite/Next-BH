@@ -1,0 +1,9 @@
+stages:
+  profile_source_workbooks:
+    cmd: python -B scripts/profile_source_workbooks.py
+    deps:
+    - scripts/profile_source_workbooks.py
+    - scripts/source-dvc-requirements.txt
+    - source_inputs/workbooks
+    outs:
+    - data/source-quality.json

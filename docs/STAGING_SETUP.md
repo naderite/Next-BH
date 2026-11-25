@@ -1,6 +1,6 @@
 # Wave 3 staging dependencies
 
-Start from a clean Next-BH checkout. Use Python 3.12, Git, Node.js 22 or newer, npm, and Docker. The pilot uses the company route `GET /recommend_pm/`, embedded Chroma, a dedicated local Ollama process, and the historical dashboard with disposable MongoDB. The opportunity input is a per-case CSV in a temporary directory. The FastAPI route scores two synthetic rows and the workflow uses the winning company and candidate product. The adapter replaces generated contact fields with a case-specific address under `example.invalid`.
+Start from a clean Next-BH checkout. Use Python 3.12, Git, Node.js 22 or newer, npm, and Docker. The pilot uses the company route `GET /recommend_pm/`, embedded Chroma, a dedicated local Ollama process, and the historical dashboard with disposable MongoDB. The opportunity input is a per-case CSV in a temporary directory. The adapter supplies scores of 90 and 25 for the two synthetic rows. The FastAPI route ranks those rows, and the workflow uses the winning company and its fixture-supplied candidate product. The adapter replaces generated contact fields with a case-specific address under `example.invalid`.
 
 ```sh
 python3.12 -m venv ../.next-bh-wave3-venv

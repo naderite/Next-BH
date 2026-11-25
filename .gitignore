@@ -14,3 +14,4 @@ mlruns/
 artifacts/
 mlops/state/
 mlflow_data/
+.run/

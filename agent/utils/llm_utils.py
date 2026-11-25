@@ -1,5 +1,5 @@
 from langchain_ollama import OllamaLLM
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 import gc
 from config import *
 from utils.recommendation_chain import product_recommendation_chain
@@ -13,7 +13,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 class LLM:
     def __init__(self):
         # Initialize the LLM
-        self.llm = OllamaLLM(model=LLM_MODEL)
+        self.llm = OllamaLLM(model=LLM_MODEL, base_url=OLLAMA_BASE_URL)
 
         # -----------------------------
         # Prompt Setup

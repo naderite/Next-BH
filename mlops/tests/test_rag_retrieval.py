@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from mlops.common import manifest as mf
@@ -30,7 +32,8 @@ def test_inventory_and_chunks_are_deterministic(corpus):
     assert inv1 == inv2
     assert [d["category"] for d in inv1["documents"]] == ["Assurance Automobile", "Assurance Vie"]
     vie = inv1["documents"][1]
-    assert vie["product"] == "Vie Plus" and str(vie["date_effet"]) == "2024-01-01"
+    assert vie["product"] == "Vie Plus" and vie["date_effet"] == "2024-01-01"
+    json.dumps(inv1)  # the inventory is written as JSON by the pipeline
 
     chunks1 = ingest_documents.ingest(inv1, 200, 20, base=corpus)
     chunks2 = ingest_documents.ingest(inv2, 200, 20, base=corpus)

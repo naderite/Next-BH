@@ -33,7 +33,19 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
-python3.12 -B "$repo_root/scripts/prepare_dashboard_snapshot.py" "$review_source"
+# `env -i` isolates the pilot from the caller's environment. On Windows (Git Bash), Python,
+# Node and npm also need the system and profile variables below to start.
+clean_env=(env -i PATH="$PATH")
+case "${OSTYPE:-}" in
+  msys* | cygwin*)
+    for var in SYSTEMROOT SYSTEMDRIVE WINDIR COMSPEC PATHEXT TEMP TMP USERPROFILE APPDATA LOCALAPPDATA PROGRAMDATA; do
+      if [[ -n "${!var:-}" ]]; then clean_env+=("$var=${!var}"); fi
+    done
+    ;;
+esac
+
+# the reviewer's interpreter is the documented Python 3.12 environment
+"$review_python" -B "$repo_root/scripts/prepare_dashboard_snapshot.py" "$review_source"
 git -C "$review_source" apply "$repo_root/web/review-pilot/dashboard.patch"
 if "$staging"; then
   git -C "$review_source" apply "$repo_root/web/review-pilot/staging.patch"
@@ -41,10 +53,10 @@ fi
 npm --prefix "$review_source/backend" ci --ignore-scripts --no-audit --no-fund
 npm --prefix "$review_source/frontend" ci --ignore-scripts --no-audit --no-fund
 "$review_source/backend/node_modules/.bin/tsc" -p "$review_source/backend/tsconfig.pilot.json" --noEmitOnError
-env -i PATH="$PATH" VITE_DRAFT_REVIEW_PILOT=true npm --prefix "$review_source/frontend" run build
+"${clean_env[@]}" VITE_DRAFT_REVIEW_PILOT=true npm --prefix "$review_source/frontend" run build
 
 if ! "$staging"; then
-env -i PATH="$PATH" PYTHONPATH="$repo_root/scripts" "$review_python" -B - "$review_work/draft.json" <<'PY'
+"${clean_env[@]}" PYTHONPATH="$repo_root/scripts" "$review_python" -B - "$review_work/draft.json" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -71,10 +83,10 @@ review_port=$(docker port "$review_mongo" 27017/tcp | cut -d: -f2)
 launch_args=("$review_port" "$review_work/draft.json" "$review_source/frontend/dist")
 if "$staging"; then
   db_name=$("$review_python" -B -c 'from secrets import token_hex; print("bh_review_stage_" + token_hex(12))')
-  env -i PATH="$PATH" "$review_python" -B "$repo_root/scripts/run_staging_recommendations.py" \
+  "${clean_env[@]}" "$review_python" -B "$repo_root/scripts/run_staging_recommendations.py" \
     --mongo-port "$review_port" --db "$db_name" "${@:4}"
   launch_args=("$review_port" --staging "$review_source/frontend/dist" "$db_name" "$reviewer_email")
 fi
-env -i PATH="$PATH" node "$review_source/backend/dist/pilot-review.js" "${launch_args[@]}" &
+"${clean_env[@]}" node "$review_source/backend/dist/pilot-review.js" "${launch_args[@]}" &
 review_server=$!
 wait "$review_server"

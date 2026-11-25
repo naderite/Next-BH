@@ -1,8 +1,12 @@
+import os
+
 # -----------------------------
 # LLM Configuration Constants
 # -----------------------------
-LLM_MODEL = "gemma3n:e4b"
-LLM_SMALL_MODEL = "Qwen/Qwen2.5-1.5B-Instruct"
+# Overridable for machines that cannot host the default models (see .env.example)
+LLM_MODEL = os.getenv("NEXTBH_LLM_MODEL", "gemma3n:e4b")
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
+LLM_SMALL_MODEL = os.getenv("NEXTBH_LLM_SMALL_MODEL", "Qwen/Qwen2.5-1.5B-Instruct")
 # -----------------------------
 # Prompt Template Config
 # -----------------------------

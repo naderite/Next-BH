@@ -31,10 +31,18 @@ le lanceur du pilote, `grounded_recommendation.py`, `draft_review.py` et les wor
 
 ## Installation
 
+En local, `scripts/nextbh.py` installe et lance tout (voir [DEMARRAGE_LOCAL.md](../DEMARRAGE_LOCAL.md)) :
+
 ```bash
-pip install -r requirements-dev.txt          # tests
-pip install -r mlops/requirements.txt        # pipelines (torch CPU conseillé)
-pytest                                       # 40+ tests, sans infrastructure
+python scripts/nextbh.py setup               # .venv (requirements-local.txt) + données synthétiques
+python scripts/nextbh.py test                # tests sans infrastructure + lint
+```
+
+Installation manuelle équivalente :
+
+```bash
+pip install -r requirements-local.txt        # agent, pipelines, policy-service, pilote, tests
+python scripts/generate_synthetic_datasets.py
 dvc init && dvc remote add -d storage $DVC_REMOTE
 ```
 

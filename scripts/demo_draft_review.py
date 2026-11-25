@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
 
+from network_guard import is_socketpair_emulation
 from pymongo import MongoClient
 from smoke_recommendation_api import EXPECTED_PRODUCT, check_recommendation_api
 from smoke_recommendation_draft import check_recommendation_draft
@@ -26,6 +27,8 @@ def check_review_paths(port):
         if event not in network_events:
             return
         if event in {"socket.connect", "socket.sendto"} and args[1] == endpoint:
+            return
+        if event == "socket.connect" and is_socketpair_emulation(args[1]):
             return
         if event == "socket.getaddrinfo" and args[:2] == endpoint:
             return

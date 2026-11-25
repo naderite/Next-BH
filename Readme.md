@@ -2,6 +2,8 @@
 
 Le [suivi d’avancement de Next-BH](docs/AVANCEMENT.md) décrit le périmètre livré, l’architecture du pilote de recommandation, les preuves Jira et GitHub, et les travaux restants. Le [prompt du rapport en français](docs/PROMPT_RAPPORT_AVANCEMENT.md) précise les fichiers à produire et les captures à réunir.
 
+**Démarrage local** : `python scripts/nextbh.py setup`, puis `models`, `up`, `rag`, `rl`, `agent`, `dashboard` — voir le [guide de démarrage local](docs/DEMARRAGE_LOCAL.md).
+
 Le périmètre MLOps et RL de Next-BH 2.0 (pipelines Data & RAG et RL, policy-service, boucle d’événements), activable par feature flags, est décrit dans [docs/nextbh2/](docs/nextbh2/RUNBOOK.md) : [audit](docs/nextbh2/AUDIT.md), [exploitation](docs/nextbh2/RUNBOOK.md) et [intégration au dashboard](docs/nextbh2/INTEGRATION.md).
 
 ## Executive Summary

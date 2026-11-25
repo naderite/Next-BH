@@ -11,6 +11,7 @@ import sys
 
 from bson import ObjectId
 from langchain_core.runnables import RunnableLambda
+from network_guard import is_socketpair_emulation
 from pymongo import MongoClient, ReturnDocument
 
 from staging_inputs import (
@@ -69,6 +70,8 @@ def restrict_connections(ports):
     def check(event, args):
         if event in {"socket.connect", "socket.sendto"}:
             endpoint = args[1]
+            if event == "socket.connect" and is_socketpair_emulation(endpoint):
+                return
             if not isinstance(endpoint, tuple) or endpoint[:2] not in ports:
                 blocked.append(event)
                 raise PermissionError("Outbound recommendation connection blocked")

@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 from datetime import datetime
 from langchain_community.document_loaders import CSVLoader, PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
 import torch
 import logging

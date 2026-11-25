@@ -11,7 +11,7 @@ import torch
 CHROMA_COLLECTION_NAME = "legal_docs"
 CHROMA_HOST = os.getenv("CHROMA_HOST", "localhost")
 CHROMA_PORT = int(os.getenv("CHROMA_PORT", "8000"))
-EMBEDDING_MODEL_NAME = "intfloat/multilingual-e5-large"
+EMBEDDING_MODEL_NAME = os.getenv("NEXTBH_EMBEDDING_MODEL", "intfloat/multilingual-e5-large")
 TOP_K = 5  # default number of results to retrieve
 MODEL_NAME = "intfloat/multilingual-e5-large"
 

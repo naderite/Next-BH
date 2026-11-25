@@ -8,7 +8,7 @@ requires-python = ">=3.11"
 include = ["mlops*", "policy_service*"]
 
 [tool.pytest.ini_options]
-testpaths = ["agent/tests", "mlops/tests", "policy_service/tests"]
+testpaths = ["agent/tests", "mlops/tests", "policy_service/tests", "tests"]
 addopts = "-q"
 
 [tool.ruff]

@@ -7,6 +7,7 @@ Pipeline A — Data & RAG: prepare → ingest → index → evaluate → publish
 import argparse
 import json
 import logging
+import os
 import sys
 
 import yaml
@@ -29,6 +30,10 @@ def main(argv=None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 
     cfg = load_config("rag")
+    # same variable as agent/rag_model/rag.py: the index must be built with the query model
+    cfg["embedding_model"] = os.getenv("NEXTBH_EMBEDDING_MODEL", cfg["embedding_model"])
+    cfg["chroma"]["host"] = os.getenv("CHROMA_HOST", cfg["chroma"]["host"])
+    cfg["chroma"]["port"] = int(os.getenv("CHROMA_PORT", cfg["chroma"]["port"]))
     thresholds = load_config("validation")["rag"]
 
     inventory = prepare.build_inventory(cfg["source_dirs"], cfg["extensions"], cfg["category_map"])

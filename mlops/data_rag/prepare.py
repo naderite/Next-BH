@@ -53,7 +53,8 @@ def build_inventory(
                 "filename": path.name,
                 "category": _category(path.parent.name, category_map),
                 "product": extra.get("produit") or _category(path.parent.name, category_map),
-                "date_effet": extra.get("date_effet"),
+                # YAML parses 2024-01-01 as a date object: keep the manifest JSON-serialisable
+                "date_effet": str(extra["date_effet"]) if extra.get("date_effet") else None,
                 "type": path.suffix.lower().lstrip("."),
             })
 

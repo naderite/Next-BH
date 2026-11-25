@@ -6,7 +6,7 @@ from io import BytesIO
 import numpy as np
 from sb3_contrib import MaskablePPO
 
-from mvp.housing import Action
+from mvp.housing import CONTACT_LIMIT, Action
 
 CONTRACT = "housing-observation-v1"
 NEEDS = ("occupant", "non_occupant")
@@ -21,7 +21,7 @@ def observation(state):
         *(need in state["available_evidence"] for need in NEEDS),
         *(state["reply"] == reply for reply in REPLIES),
         *(action.name in state["sent"] for action in Action),
-        (5 - state["contacts"]) / 5,
+        (CONTACT_LIMIT - state["contacts"]) / CONTACT_LIMIT,
     ], dtype=np.float32)
 
 

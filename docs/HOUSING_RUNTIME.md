@@ -20,7 +20,7 @@ Créer un dossier, préparer la prochaine action, puis approuver ou rejeter le b
 
 ## P1 · Catalogue
 
-`python -m mvp.catalog` matérialise les entrées de `mvp/catalog.json` dans Chroma et publie un manifeste comprenant la version, le SHA-256 et le nom de la collection. Au démarrage, le service compare la collection et son manifeste au catalogue de la version déployée. La recherche par produit est exacte. Le scénario « Catalogue incomplet » permet de vérifier l’abstention quand le passage requis manque. Une révision approuvée après un changement du catalogue est bloquée si elle cite une ancienne version.
+`python -m mvp.catalog` matérialise les entrées de `mvp/catalog.json` dans Chroma et publie un manifeste comprenant la version, le SHA-256 et le nom de la collection. Au démarrage, le service compare la collection et son manifeste au catalogue de la version déployée. La recherche par produit est exacte. Le scénario « Catalogue incomplet » permet de vérifier l’abstention quand le passage requis manque. Une proposition, une explication ou une relance est liée à la version du catalogue. Si la preuve est absente ou périmée lors de l’approbation, le service conserve la décision du réviseur, bloque le contact simulé et clôture le dossier.
 
 ## P2 · Politique entraînée
 
@@ -35,7 +35,7 @@ $env:NEXT_BH_POLICY_SHA256 = (Get-FileHash $env:NEXT_BH_POLICY -Algorithm SHA256
 & $housingPython -m uvicorn mvp.app:app --host 127.0.0.1 --port 8012 --workers 1
 ```
 
-Utiliser uniquement un modèle issu d’un entraînement de confiance. Le service vérifie son empreinte et le contrat d’observation. Chaque décision trace le modèle utilisé et les actions autorisées. Le rapport JSON compare le modèle à une politique de règles et à un choix aléatoire parmi les actions autorisées. Les trois politiques rejouent les mêmes scénarios synthétiques avec des graines d’évaluation distinctes de l’entraînement. Ce premier benchmark mesure ces scénarios et ne permet pas d’estimer des résultats commerciaux réels.
+Utiliser uniquement un modèle issu d’un entraînement de confiance. Le service vérifie son empreinte et le contrat d’observation. Chaque décision trace la politique utilisée et les actions autorisées. Si l’inférence échoue ou renvoie une action interdite, le service applique les règles sur les actions autorisées et trace le modèle tenté et le motif. Le rapport JSON compare le modèle à une politique de règles et à un choix aléatoire parmi les actions autorisées. Les trois politiques rejouent les mêmes scénarios synthétiques avec des graines d’évaluation distinctes de l’entraînement. Ce premier benchmark mesure ces scénarios synthétiques.
 
 ## Vérification
 

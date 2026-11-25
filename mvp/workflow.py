@@ -6,8 +6,10 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 
 from mvp.housing import (
-    PRODUCT_ACTIONS, Action, Need, Reply, allowed_actions, contact_result, prepare_draft, rules,
+    Action, Need, Reply, allowed_actions, contact_result, prepare_draft, requires_evidence, rules,
 )
+
+RULES_VERSION = "rules-v1"
 
 
 class Episode(TypedDict, total=False):
@@ -27,6 +29,21 @@ class Episode(TypedDict, total=False):
     events: list[dict]
 
 
+def choose_action(context, allowed, policy):
+    if policy is None:
+        return rules(allowed), RULES_VERSION, {}
+
+    try:
+        action = policy.act(context, allowed)
+    except (RuntimeError, ValueError):
+        reason = "inference_failed"
+    else:
+        if action in allowed:
+            return action, policy.version, {}
+        reason = "ineligible_action"
+    return rules(allowed), RULES_VERSION, {"reason": reason, "attempted_policy": policy.version}
+
+
 def decide(state: Episode, policy, index):
     request = state["request"]
     if request is None:
@@ -37,12 +54,10 @@ def decide(state: Episode, policy, index):
         "available_evidence": [need for need in state["available_evidence"] if need in index.entries],
     }
     allowed = allowed_actions(context)
-    action = rules(allowed) if policy is None else policy.act(context, allowed)
-    if action not in allowed:
-        raise ValueError("The policy selected an ineligible action")
+    action, policy_version, fallback = choose_action(context, allowed, policy)
     revision = state["revision"] + 1
     evidence = None
-    if action in PRODUCT_ACTIONS.get(state["need"], ()):
+    if requires_evidence(action, state["need"]):
         evidence = {
             **index.entries[state["need"]], "catalog_version": index.version,
             "catalog_sha256": index.digest,
@@ -51,10 +66,12 @@ def decide(state: Episode, policy, index):
     event = {
         "type": "policy",
         "revision": revision,
-        "policy": "rules-v1" if policy is None else policy.version,
+        "policy": policy_version,
         "allowed": [candidate.name for candidate in allowed],
         "action": action.name,
     }
+    if fallback:
+        event["fallback"] = fallback
     if action == Action.STOP and state["need"] is not None:
         if state["need"] == state["owned"]:
             event["reason"] = "already_owned"
@@ -95,13 +112,17 @@ def review(state: Episode, index):
         "events": events,
         "receipts": {**state["receipts"], decision["request_id"]: decision},
     }
-    if approved and evidence is not None and evidence.get("catalog_sha256") != index.digest:
-        update["events"] = [*events, {"type": "execution_blocked", "reason": "evidence_version_changed"}]
+    if approved and requires_evidence(action, state["need"]) and (
+        not evidence or evidence.get("catalog_sha256") != index.digest
+    ):
+        update["events"] = [*events, {
+            "type": "execution_blocked", "revision": revision, "reason": "evidence_version_changed",
+        }]
     elif approved:
         outcome = contact_result(state, action)
         update.update(outcome)
         update["events"] = [*events, {
-            "type": "simulated_response", "action": action.name, "reply": outcome["reply"],
+            "type": "simulated_response", "revision": revision, "action": action.name, "reply": outcome["reply"],
         }]
     return update
 

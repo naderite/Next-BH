@@ -47,7 +47,8 @@ function render(data) {
     const item = document.createElement("li");
     if (event.type === "policy") {
       const reason = reasons[event.reason];
-      item.textContent = reason ? `${actions[event.action]} · ${reason}` : actions[event.action];
+      const details = [actions[event.action], reason, event.fallback && "Politique de règles utilisée"];
+      item.textContent = details.filter(Boolean).join(" · ");
     }
     if (event.type === "review") {
       item.textContent = `Révision ${event.draft.revision} ${event.verdict === "approve" ? "approuvée" : "rejetée"} par ${event.reviewer}`;

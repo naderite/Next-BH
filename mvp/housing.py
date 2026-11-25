@@ -16,6 +16,7 @@ class Action(IntEnum):
 
 Need = Literal["occupant", "non_occupant"]
 Reply = Literal["none", "need_revealed", "objection", "no_response", "refusal", "accepted"]
+CONTACT_LIMIT = 5
 
 SCENARIOS = {
     "tenant": ("Locataire", "occupant", "objection"),
@@ -47,7 +48,7 @@ def initial_scenario(scenario):
 
 def allowed_actions(state):
     allowed = [Action.STOP]
-    if state["contacts"] >= 5 or state["reply"] in ("accepted", "refusal"):
+    if state["contacts"] >= CONTACT_LIMIT or state["reply"] in ("accepted", "refusal"):
         return allowed
     need = state["need"]
     if need is None:
@@ -63,6 +64,10 @@ def allowed_actions(state):
     if state["reply"] == "no_response" and Action.FOLLOW_UP.name not in sent:
         allowed.append(Action.FOLLOW_UP)
     return allowed
+
+
+def requires_evidence(action, need):
+    return action == Action.FOLLOW_UP or action in PRODUCT_ACTIONS.get(need, ())
 
 
 def rules(allowed):
@@ -98,5 +103,5 @@ def contact_result(state, action):
         "reply": reply,
         "contacts": contacts,
         "sent": [*state["sent"], action.name],
-        "status": "closed" if reply in ("refusal", "accepted") or contacts >= 5 else "ready",
+        "status": "closed" if reply in ("refusal", "accepted") or contacts >= CONTACT_LIMIT else "ready",
     }

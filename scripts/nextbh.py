@@ -4,7 +4,7 @@ Next-BH local launcher (Windows, Linux, macOS). Standard library only.
     python scripts/nextbh.py doctor          check prerequisites and running services
     python scripts/nextbh.py setup           create .venv (Python 3.12) and generate synthetic data
     python scripts/nextbh.py models          pre-download the LLM and embedding models (resumable)
-    python scripts/nextbh.py up              start Docker infra + recommendation API + policy-service
+    python scripts/nextbh.py up              start Docker infra, recommendation API, policy-service, Ollama
     python scripts/nextbh.py down            stop what `up` started
     python scripts/nextbh.py status          show services and URLs
     python scripts/nextbh.py rag             run the Data & RAG pipeline and promote if approved
@@ -66,6 +66,7 @@ URLS = {
     "mongo-express": "http://127.0.0.1:8081",
     "ChromaDB": "http://127.0.0.1:8000/api/v2/heartbeat",
     "Zipkin": "http://127.0.0.1:9411",
+    "Ollama (LLM de l'agent)": "http://127.0.0.1:11434/api/version",
     "AKHQ (Kafka, --events)": "http://127.0.0.1:8090",
 }
 
@@ -254,6 +255,37 @@ def cmd_doctor(args) -> None:
     print(f"\n{sum(checks)}/{len(checks)} checks passed")
 
 
+PORTABLE_OLLAMA = ROOT.parent / "tools" / "ollama"
+
+
+def ollama_command(env: dict):
+    """Installed `ollama`, else the portable copy in ../tools/ollama (with its own models dir)."""
+    env = dict(env)
+    env["OLLAMA_HOST"] = env["OLLAMA_BASE_URL"].split("://", 1)[-1]
+    installed = shutil.which("ollama")
+    if installed:
+        return installed, env
+    portable = PORTABLE_OLLAMA / ("ollama.exe" if WINDOWS else "ollama")
+    if portable.exists():
+        env.setdefault("OLLAMA_MODELS", str(PORTABLE_OLLAMA / "models"))
+        return str(portable), env
+    return None, env
+
+
+def start_ollama(env: dict, running: dict) -> None:
+    if http_ok(f"{env['OLLAMA_BASE_URL']}/api/version"):
+        print("ollama: already running")
+        return
+    exe, ollama_env = ollama_command(env)
+    if not exe:
+        print("ollama: not installed (needed by the agent, see docs/DEMARRAGE_LOCAL.md)")
+        return
+    running["ollama"] = start_background("ollama", [exe, "serve"], ROOT, ollama_env)
+    save_pids(running)
+    ok = wait_for(f"{env['OLLAMA_BASE_URL']}/api/version", 60)
+    print(f"ollama: {'up' if ok else 'NOT READY, see .run/ollama.log'} (pid {running['ollama']})")
+
+
 def cmd_up(args) -> None:
     env = load_env()
     compose("up", "-d")
@@ -271,6 +303,7 @@ def cmd_up(args) -> None:
         save_pids(running)
         ok = wait_for(health, 120)
         print(f"{name}: {'up' if ok else 'NOT READY, see .run/' + name + '.log'} (pid {pid})")
+    start_ollama(env, running)
     if not wait_for("http://127.0.0.1:8000/api/v2/heartbeat", 120):
         print("ChromaDB not ready yet: check `docker compose logs server`")
     cmd_status(args)
@@ -390,11 +423,10 @@ def cmd_models(args) -> None:
           env.get("NEXTBH_LLM_SMALL_MODEL", "Qwen/Qwen2.5-1.5B-Instruct")]
     run([python(), "-c", HF_DOWNLOAD, *hf], env=env)
     model = env.get("NEXTBH_LLM_MODEL", "gemma3n:e4b")
-    ollama = shutil.which("ollama") or str(ROOT.parent / "tools" / "ollama" / "ollama.exe")
-    if not Path(ollama).exists() and not shutil.which("ollama"):
+    ollama, env = ollama_command(env)
+    if not ollama:
         print(f"Ollama not found: install it, then run `ollama pull {model}`")
         return
-    env["OLLAMA_HOST"] = env["OLLAMA_BASE_URL"].split("://", 1)[-1]
     for attempt in range(1, 31):
         if run([ollama, "pull", model], env=env, check=False) == 0:
             return

@@ -34,7 +34,7 @@ conditions générales par branche dans `data/rag_docs/`. Ces fichiers sont igno
 ## Lancer la plateforme
 
 ```powershell
-py scripts\nextbh.py up            # Docker + API recommandation + policy-service
+py scripts\nextbh.py up            # Docker + API recommandation + policy-service + Ollama
 py scripts\nextbh.py rag           # indexe data/rag_docs, évalue, promeut rag/latest.json
 py scripts\nextbh.py rl            # entraîne LinUCB + MaskablePPO, compare, promeut rl/latest.json
 py scripts\nextbh.py agent --once  # un cycle de l'agent (sans --once : boucle continue)
@@ -82,12 +82,9 @@ et les sources temporaires.
 
 L'archive officielle `ollama-windows-amd64.zip`
 (https://github.com/ollama/ollama/releases) peut être décompressée dans un dossier voisin du
-dépôt, `..\tools\ollama\`, que `nextbh.py models` utilise automatiquement :
-
-```powershell
-$env:OLLAMA_HOST="127.0.0.1:11434"; $env:OLLAMA_MODELS="..\tools\ollama\models"
-..\tools\ollama\ollama.exe serve
-```
+dépôt, `..\tools\ollama\`. Sans Ollama installé, `nextbh.py models` y télécharge le modèle et
+`nextbh.py up` y démarre le serveur (modèles dans `..\tools\ollama\models`, journal dans
+`.run\ollama.log`) ; `down` l'arrête. Une installation classique d'Ollama est utilisée en priorité.
 
 ## Dépannage
 
@@ -96,5 +93,6 @@ $env:OLLAMA_HOST="127.0.0.1:11434"; $env:OLLAMA_MODELS="..\tools\ollama\models"
 | `docker compose up` reste bloqué à « Creating » | un autre `docker compose` est encore en cours : l'arrêter puis relancer |
 | ChromaDB s'arrête avec « readonly database » | ancienne version du compose avec `./chroma_data` monté : les volumes sont maintenant nommés |
 | Téléchargement interrompu (DNS, connexion réinitialisée) | relancer `nextbh.py models` : les téléchargements reprennent |
+| `llama-server … CUDA error` dans `.run/ollama.log` | échec ponctuel au premier chargement GPU du modèle ; Ollama le relance et l'agent réessaie l'appel automatiquement |
 | Mémoire insuffisante pour l'agent | modèles plus légers dans `.env` (`NEXTBH_LLM_MODEL=gemma3n:e2b`, …) |
 | SQL Server / Kafka Connect | profils optionnels `sql` et `events` (`docker compose --profile sql up -d`), à réserver à une VM Docker de 4 Go ou plus |

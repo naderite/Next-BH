@@ -1,6 +1,7 @@
 # Next-BH 2.0 — Mise en route et exploitation
 
-Complète `AUDIT.md` (état initial) et `INTEGRATION.md` (backend / dashboard).
+Complète `AUDIT.md` (état initial), `INTEGRATION.md` (backend / dashboard) et
+`VERIFICATION_LOCALE.md` (exécution vérifiée de bout en bout).
 Résultats RL = **simulation** : ils ne prouvent pas un gain de conversion réel.
 
 ## Arborescence ajoutée

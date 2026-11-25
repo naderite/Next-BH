@@ -1,6 +1,6 @@
 import re
 import logging
-from .config import *
+from .config import INTENT_LABELS, PATTERNS, PRODUCT_KEYWORDS, PRODUCT_LABELS
 import unicodedata
 
 from transformers import pipeline, AutoTokenizer

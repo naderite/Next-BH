@@ -1,17 +1,10 @@
+from config import MAIL_SUBJECT_PROMPT, SALES_STRATEGIES
+from utils.endpoint_utils import get_product_name_from_endpoint_data
+from utils.general_utils import analyze_intent, generate_explanation, query_rag
 from utils.llm_utils import LLM
-import gc
-
-from utils.general_utils import *
-from utils.endpoint_utils import (
-    get_strategy_specific_prompts,
-    get_product_name_from_endpoint_data,
-)
-from config import *
 from utils.mongodb_conn import (
     append_message_to_conversation,
-    get_first_open_conversation,
     get_first_open_status_conversation,
-    get_conversations_with_open_status,
     update_conversation_status,
     create_or_get_client,
 )
@@ -36,11 +29,6 @@ class SalesAgent:
 
     def agent_initiate(self, user_data) -> str:
         """Premier message avec prompts spécialisés selon le scénario business"""
-
-        # Display user data for debugging
-        print("\n", "=" * 50)
-        print(f'[agent main]: User data: {user_data["user_data_str"]}')
-        print("\n", "=" * 50)
 
         # Extract product name and business strategy
         data = user_data.get("data", {})
@@ -173,7 +161,7 @@ Explication de génération — Stratégie générique
 
         print(f"RAG Context: {rag_context}")
         response = self.llm.query_llm(
-            True,
+            False,
             user_data,
             rag_context,
             system_prompt=strategy["system_prompt"],

@@ -3,7 +3,7 @@ Tunisian names utility for generating realistic Tunisian names for individuals a
 """
 
 import random
-from typing import Dict, Tuple
+from typing import Dict
 
 
 # Tunisian first names (male and female)

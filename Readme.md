@@ -4,25 +4,25 @@ L’[application habitation Next-BH](docs/HOUSING_RUNTIME.md) permet de créer d
 
 Le [suivi d’avancement de Next-BH](docs/AVANCEMENT.md) décrit le périmètre livré, l’architecture du pilote de recommandation, les preuves Jira et GitHub, et les travaux restants. Le [prompt du rapport en français](docs/PROMPT_RAPPORT_AVANCEMENT.md) précise les fichiers à produire et les captures à réunir.
 
-## Executive Summary
+## Supported local workflows
 
-**Next Deal** is a modular, AI-driven insurance sales and client engagement platform for BH Assurance. It leverages state-of-the-art conversational AI, retrieval-augmented generation (RAG), intent analysis, and multi-channel integration (web, email, Kafka) to automate, personalize, and streamline client interactions, product recommendations, and operational workflows.
+Use the housing application above for simulated individual cases with persistent review. Use the [staging runbook](docs/STAGING_SETUP.md) for the separate company recommendation and draft review pilot. Both workflows use synthetic inputs and produce zero outbound customer messages. [Architecture inventory and roadmap](https://github.com/naderite/Next-BH/pull/17)
 
 ---
 
-## System Architecture
+## Original Next Deal prototype
 
-The platform is composed of several tightly integrated subsystems:
+The original prototype contains a Python worker, a FastAPI opportunity service, MongoDB storage, retrieval, and Gmail ingestion helpers. The historical React and Express dashboard is available through the [pilot export](docs/DASHBOARD_SOURCE.md). Kafka and Kafka Connect are infrastructure configuration. The original worker and its external integrations require separate data, configuration, and validation.
 
 - **AI Agent Orchestration:** Central logic for managing conversations, generating responses, and coordinating with other modules.
 - **RAG (Retrieval-Augmented Generation):** Semantic search over legal and product documents to enrich AI responses.
 - **Intent Analysis:** Hybrid rule-based and ML-powered detection of user intent and product interest.
 - **API Datasets (FastAPI):** Microservices for recommendations, guarantees, invoices, and renewals.
 - **MongoDB Integration:** Persistent storage for clients, conversations, and messages.
-- **Email Integration:** Automated email ingestion and reply handling via Gmail API and webhooks.
+- **Email Integration:** Gmail polling and reply intake helpers.
 - **Web Frontend (React/TypeScript):** Admin dashboard for analytics, validation, and client management.
 - **Backend (Node.js/Express):** RESTful API, business logic, and security middleware.
-- **Kafka Pipeline:** Event streaming for scalable integrations and automation.
+- **Kafka Pipeline:** Standalone Kafka and Kafka Connect service definitions.
 - **Configuration & Utilities:** Shared constants, helpers, and connectors.
 
 ---

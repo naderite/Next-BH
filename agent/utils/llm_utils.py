@@ -1,7 +1,21 @@
 from langchain_ollama import OllamaLLM
 from langchain.prompts import PromptTemplate
 import gc
-from config import *
+from config import (
+    COMPANY_NAME,
+    CONTRACT_RENEWAL_PROMPT,
+    INITIAL_SALES_PROMPT_INPUT_VARS,
+    INITIAL_SALES_PROMPT_TEMPLATE,
+    LANGUAGE,
+    LLM_MODEL,
+    LLM_SMALL_MODEL,
+    MAX_SENTENCES,
+    PAYMENT_REMINDER_PROMPT,
+    RAG_QUERY_PROMPT,
+    SALES_PROMPT_INPUT_VARS,
+    SALES_PROMPT_TEMPLATE,
+    SMALL_RAG_QUERY_PROMPT,
+)
 from utils.recommendation_chain import product_recommendation_chain
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -126,7 +140,10 @@ class LLM:
                     "system_prompt": system_prompt,
                     "user_data": user_data,
                     "rag_context": rag_context,
-                    "conversation_history": "\n".join(conversation_history),
+                    "conversation_history": (
+                        conversation_history if isinstance(conversation_history, str)
+                        else "\n".join(conversation_history)
+                    ),
                     "latest_user_message": user_message,
                 }
             )
@@ -169,7 +186,10 @@ class LLM:
         """
         response = self.rag_chain.invoke(
             {
-                "conversation_history": "\n".join(conversation_history),
+                "conversation_history": (
+                    conversation_history if isinstance(conversation_history, str)
+                    else "\n".join(conversation_history)
+                ),
                 "latest_user_message": latest_user_message,
             }
         )

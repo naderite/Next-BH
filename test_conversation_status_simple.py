@@ -23,7 +23,6 @@ from utils.mongodb_conn import (
     update_conversation_status
 )
 from pymongo import MongoClient
-from datetime import datetime
 
 # MongoDB connection
 MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017/BH")

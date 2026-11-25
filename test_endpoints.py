@@ -4,11 +4,9 @@ Test script to validate the updated agent system with api_datasets endpoints.
 """
 
 import sys
-import os
 sys.path.append('/home/nader/Projects/NextBH/BH-Assurance/agent')
 
 from utils.user_profile_conn import (
-    fetch_new_user, 
     fetch_endpoint_data, 
     get_available_strategies,
     ENDPOINTS

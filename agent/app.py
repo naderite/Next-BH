@@ -43,7 +43,7 @@ if __name__ == "__main__":
             else:
                 # No open conversations, try to get new user data for initial message
                 user_data = fetch_new_user_data()
-                if user_data:
+                if user_data["data"]:
                     print("👤 Processing new user data - generating initial message...")
                     reply, explanation, subject = generate_initial_message(agent, user_data)
                     print(

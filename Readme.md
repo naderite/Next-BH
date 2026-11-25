@@ -73,7 +73,7 @@ The original prototype contains a Python worker, a FastAPI opportunity service, 
 
 ### 6. **Email Integration**
 
-- **Location:** [`agent/utils/mail_reciever.py`](agent/utils/mail_reciever.py), backend webhook
+- **Location:** [`agent/utils/mail_reciever.py`](agent/utils/mail_reciever.py)
 - **Function:** Automates email ingestion, reply handling, and synchronization with MongoDB.
 - **Usage:** Ensures multi-channel engagement and seamless conversation tracking.
 
@@ -87,13 +87,12 @@ The original prototype contains a Python worker, a FastAPI opportunity service, 
 
 - **Location:** [`backend/` in the verified dashboard snapshot](https://github.com/roudayn-kouka/BH-Assurance/tree/a18e1e0fc402af64d63a16fba5532bc357d077e1/backend)
 - **Function:** REST API for clients, conversations, messages, and email webhooks; implements security and business logic.
-- **Usage:** Serves both frontend and agent; enforces rate limiting and authentication.
+- **Usage:** Serves the historical dashboard. See its source for route and middleware configuration.
 
 ### 9. **Kafka Pipeline**
 
 - **Location:** [`pipeline/kafka/docker-compose.yml`](pipeline/kafka/docker-compose.yml), [`entrypoint.sh`](entrypoint.sh), [`plugins.sh`](plugins.sh)
-- **Function:** Event streaming for scalable integrations (e.g., notifications, external systems).
-- **Usage:** Enables real-time automation and future extensibility.
+- **Function:** Defines standalone Kafka and Kafka Connect services. The checked-in application paths use direct database or HTTP calls.
 
 ---
 
@@ -113,82 +112,15 @@ For a local walkthrough with synthetic data, see the [company recommendation dem
 
 The [human review demo](docs/DRAFT_REVIEW_DEMO.md) covers the isolated dashboard. The [Wave 3 staging runbook](docs/STAGING_PILOT.md) covers the full synthetic recommendation and review pilot, including its documented CI results and live staging acceptance criteria.
 
-### Historical platform setup
+### Historical platform
 
-The prerequisites and setup steps below describe the earlier broad platform, including email and Kafka. Use the guides above to run the current synthetic pilot from a clean Next-BH checkout. See the [dashboard source notes](docs/DASHBOARD_SOURCE.md) for the available snapshot and the current gitlink.
-
-### Prerequisites
-
-- Python 3.11+
-- Node.js 18+
-- MongoDB 6+
-- Docker & Docker Compose
-- Kafka (via Docker)
-- ChromaDB (via Docker)
-- Gmail API credentials (`credentials.json`, `token.json`)
-
-### Setup Steps
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/roudayn-kouka/BH-Assurance.git
-   cd BH-Assurance
-   ```
-
-2. **Start infrastructure:**
-   ```bash
-   docker-compose up -d
-   ```
-
-3. **Install Python dependencies:**
-   ```bash
-   cd agent
-   pip install -r requirements.txt
-   ```
-
-4. **Install Node.js dependencies:**
-   ```bash
-   cd web/BH-Assurance/backend
-   npm install
-   ```
-
-5. **Configure Gmail API:**
-   - Place `credentials.json` and `token.json` in `agent/utils/`.
-   - Run the mail receiver once to authenticate.
-
-6. **Start the AI agent:**
-   ```bash
-   cd agent 
-   python app.py
-   ```
-
-7. **Start backend and frontend:**
-   ```bash
-   # Backend
-   cd web/BH-Assurance/backend
-   npm run dev
-
-   # Frontend
-   cd ../frontend
-   npm run dev
-   ```
+The original worker depends on prepared opportunity CSVs, model services, MongoDB and external documents. The repository provides reproducible runbooks for the two synthetic workflows above. See the [dashboard source notes](docs/DASHBOARD_SOURCE.md) for the verified export and the historical gitlink.
 
 ---
 
-## Validation & Governance Workflow
+## Human review
 
-- AI-generated responses are flagged as `pending` in MongoDB.
-- Admins review, edit, and approve responses via the frontend dashboard.
-- Only validated responses are sent to clients, ensuring compliance and quality control.
-- All actions are logged for auditability.
-
----
-
-## Security & Compliance
-
-- JWT authentication and robust rate limiting (`rate-limit.middleware.ts`) protect all APIs.
-- Sensitive credentials and tokens are excluded from version control (`.gitignore`).
-- All data access and modifications are logged for regulatory compliance.
+The company pilot saves drafts as pending in disposable MongoDB and records reviewer decisions in the dashboard. The housing application persists review decisions and simulated outcomes separately in SQLite. Housing reviewer names are local form input. Shared deployment requires authenticated reviewer accounts, persistent storage and restore checks.
 
 ---
 

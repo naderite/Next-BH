@@ -1,5 +1,5 @@
 from langchain_ollama import OllamaLLM
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 import gc
 from config import (
     COMPANY_NAME,

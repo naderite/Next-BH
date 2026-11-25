@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Next-BH · Habitation</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body>
+  <header><span>Next-BH</span><span>Espace de simulation</span></header>
+  <main>
+    <h1>Assurance habitation</h1>
+    <section aria-labelledby="cases-title">
+      <h2 id="cases-title">Dossiers</h2>
+      <form id="new-case">
+        <label>Scénario <select id="scenarios" required></select></label>
+        <button>Créer un dossier</button>
+      </form>
+      <form id="open-case">
+        <label>Identifiant du dossier <input id="case-id" required autocomplete="off"></label>
+        <button class="secondary">Ouvrir</button>
+      </form>
+    </section>
+    <p id="status" role="status"></p>
+    <section id="episode" hidden aria-labelledby="episode-title">
+      <h2 id="episode-title">Dossier courant</h2>
+      <p id="summary"></p>
+      <button id="step">Préparer la prochaine action</button>
+      <article id="draft" hidden>
+        <h3>Brouillon à valider</h3>
+        <p id="message"></p>
+        <p id="source"></p>
+        <form id="review">
+          <label>Nom du réviseur <input id="reviewer" autocomplete="name" required maxlength="80"></label>
+          <button name="verdict" value="approve">Approuver</button>
+          <button name="verdict" value="reject" class="secondary">Rejeter</button>
+        </form>
+      </article>
+      <h3>Historique</h3>
+      <ol id="history"></ol>
+    </section>
+  </main>
+</body>
+</html>

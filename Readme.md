@@ -1,5 +1,7 @@
 # Next Deal — Comprehensive Documentation
 
+L’[application habitation Next-BH](docs/HOUSING_RUNTIME.md) permet de créer des dossiers simulés, valider des brouillons sourcés et reprendre les échanges après un redémarrage. Le guide couvre aussi la construction du catalogue et l’entraînement de la politique.
+
 Le [suivi d’avancement de Next-BH](docs/AVANCEMENT.md) décrit le périmètre livré, l’architecture du pilote de recommandation, les preuves Jira et GitHub, et les travaux restants. Le [prompt du rapport en français](docs/PROMPT_RAPPORT_AVANCEMENT.md) précise les fichiers à produire et les captures à réunir.
 
 ## Executive Summary

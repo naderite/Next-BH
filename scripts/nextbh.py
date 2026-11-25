@@ -408,7 +408,7 @@ def cmd_test(args) -> None:
     lint = ["mlops", "policy_service", "scripts/smoke_policy_service.py", "scripts/nextbh.py",
             "scripts/generate_synthetic_datasets.py", "agent/orchestrator.py",
             "agent/compliance.py", "agent/feature_flags.py", "agent/utils/policy_client.py",
-            "agent/utils/event_publisher.py", "agent/tests"]
+            "agent/utils/event_publisher.py", "agent/utils/llm_output.py", "agent/tests"]
     run([py, "-m", "ruff", "check", *lint])
 
 

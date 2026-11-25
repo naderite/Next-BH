@@ -62,11 +62,21 @@ def admin_verdict_event(decision: Dict, message_id: str, conversation_id: Option
 
 def kafka_producer(bootstrap: str):
     from kafka import KafkaProducer
+    from kafka.serializer import Serializer
+
+    class Utf8(Serializer):
+        def serialize(self, topic, *args):  # (value) or (headers, value) by version
+            value = args[-1]
+            return value.encode("utf-8")
+
+    class Json(Serializer):
+        def serialize(self, topic, *args):  # (value) or (headers, value) by version
+            value = args[-1]
+            return json.dumps(value, ensure_ascii=False).encode("utf-8")
 
     return KafkaProducer(
         bootstrap_servers=bootstrap, acks="all", retries=3,
-        key_serializer=lambda k: k.encode("utf-8"),
-        value_serializer=lambda v: json.dumps(v, ensure_ascii=False).encode("utf-8"),
+        key_serializer=Utf8(), value_serializer=Json(),
     )
 
 

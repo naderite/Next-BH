@@ -31,11 +31,16 @@ def read_jsonl(path: Path) -> Iterable[Dict]:
 
 def read_kafka(topic: str, bootstrap: str, state_path: Path, max_records: int = 100_000) -> Iterable[Dict]:
     from kafka import KafkaConsumer, TopicPartition
+    from kafka.serializer import Deserializer
 
     state = read_json(state_path) if state_path.exists() else {"offsets": {}}
+    class Json(Deserializer):
+        def deserialize(self, topic, *args):  # (data) or (headers, data) by version
+            data = args[-1]
+            return json.loads(data.decode("utf-8"))
+
     consumer = KafkaConsumer(bootstrap_servers=bootstrap, enable_auto_commit=False,
-                             value_deserializer=lambda v: json.loads(v.decode("utf-8")),
-                             consumer_timeout_ms=5000)
+                             value_deserializer=Json(), consumer_timeout_ms=5000)
     partitions = [TopicPartition(topic, p) for p in consumer.partitions_for_topic(topic) or []]
     consumer.assign(partitions)
     for tp in partitions:

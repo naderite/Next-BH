@@ -29,7 +29,11 @@ def test_respond_uses_rag_when_strategy_requires_it(monkeypatch, intent, rag_cal
 
     assert response == "Bonjour, voici notre proposition."
     assert rag_calls == ["rag query for: Je veux un devis"]
-    _, _, kwargs = [c for c in sales_agent.llm.calls if c[0] == "query_llm"][0]
+    _, args, kwargs = [c for c in sales_agent.llm.calls if c[0] == "query_llm"][0]
+    # the reply chain (is_initial=False) is the one that reads the message and the strategy
+    assert args[0] is False
+    assert kwargs["user_message"] == "Je veux un devis"
+    assert kwargs["conversation_history"] == "historique"
     assert kwargs["system_prompt"] == config.SALES_STRATEGIES["devis"]["system_prompt"]
     assert "Retrieved RAG info" in sales_agent.llm.calls[-1][1][2]
     assert "devis" in explanation

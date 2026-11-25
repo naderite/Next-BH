@@ -136,3 +136,13 @@ def test_decision_event_only_published_when_flag_on(monkeypatch):
     assert event_publisher.publish_decision(decision, "c1", "m1", Publisher())
     assert published[0].event_type == "decision_made" and published[0].message_id == "m1"
     assert not event_publisher.publish_decision(None, "c1", "m1", Publisher())
+
+
+def test_initial_message_records_rag_sources(agent_mod, monkeypatch, user_data):
+    _service(monkeypatch, action="recommend_product")
+    sales_agent = agent_mod(USE_ORCHESTRATOR=False, POLICY_MODE="active").SalesAgent()
+    response, explanation, _ = sales_agent.agent_initiate(user_data)
+
+    assert response
+    assert sales_agent.last_decision["sources"][0]["source"] == "data/CG-Automobile/cg_auto.pdf"
+    assert "cg_auto.pdf (version 2024)" in explanation

@@ -103,9 +103,11 @@ class SalesAgent:
                     format_decision_block(decision, [], None, rag.get_index_info())
                 return None, explanation, None
 
-        # Generate RAG context based on the product
+        # Generate RAG context based on the product (same text as query_rag(), sources kept)
         rag_query = self.llm.query_small_rag_llm(product_name)
-        rag_context = query_rag(rag_query)
+        docs = rag.retrieve(rag_query, 3)
+        rag_context = f"Retrieved RAG info: {rag.build_context(docs)}"
+        sources = [rag.source_of(d) for d in docs]
 
         # Use scenario-specific prompts for better targeting
         print(f"[agent main]: Using scenario-specific prompt for: {endpoint_strategy}")
@@ -133,7 +135,9 @@ class SalesAgent:
         if decision is not None:
             from orchestrator import format_decision_block
 
-            explanation += format_decision_block(decision, [], None, rag.get_index_info())
+            explanation += format_decision_block(decision, sources, None, rag.get_index_info())
+            self.last_decision = {**self.last_decision, "sources": sources,
+                                  "rag_index": rag.get_index_info()}
 
         # Generate contextual subject line
         subject = self.llm.generate_mail_object(
@@ -233,8 +237,10 @@ Explication de génération — Stratégie générique
             rag_context = ""
 
         print(f"RAG Context: {rag_context}")
+        # is_initial=False: the reply chain is the one that reads the client's message,
+        # the history and the intent strategy (the initial-pitch chain ignores them)
         response = self.llm.query_llm(
-            True,
+            False,
             user_data,
             rag_context,
             system_prompt=strategy["system_prompt"],

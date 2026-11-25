@@ -2,7 +2,9 @@ from langchain_ollama import OllamaLLM
 from langchain_core.prompts import PromptTemplate
 import gc
 from config import *
+from utils.llm_output import clean_subject, extract_mail_body
 from utils.recommendation_chain import product_recommendation_chain
+import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # -----------------------------
@@ -13,7 +15,10 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 class LLM:
     def __init__(self):
         # Initialize the LLM
-        self.llm = OllamaLLM(model=LLM_MODEL, base_url=OLLAMA_BASE_URL)
+        # retried: the first GPU load of a model can fail transiently (Ollama restarts it)
+        self.llm = OllamaLLM(model=LLM_MODEL, base_url=OLLAMA_BASE_URL).with_retry(
+            stop_after_attempt=3, wait_exponential_jitter=True
+        )
 
         # -----------------------------
         # Prompt Setup
@@ -48,9 +53,12 @@ class LLM:
             input_variables=["user_data", "rag_context", "product_name"],
             template=CONTRACT_RENEWAL_PROMPT,
         )
+        # Explicit device: with device_map="auto", accelerate offloads the weights to "disk"
+        # when the Ollama model already holds the RAM, and loading then fails.
+        device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model = AutoModelForCausalLM.from_pretrained(
-            LLM_SMALL_MODEL, torch_dtype="auto", device_map="auto"
-        )
+            LLM_SMALL_MODEL, torch_dtype="auto", low_cpu_mem_usage=True
+        ).to(device)
         self.tokenizer = AutoTokenizer.from_pretrained(LLM_SMALL_MODEL)
         # -----------------------------
         # Chains
@@ -97,7 +105,7 @@ class LLM:
         response = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[
             0
         ]
-        return response
+        return clean_subject(response)
 
     def query_llm(
         self,
@@ -121,16 +129,19 @@ class LLM:
                 }
             )
         else:
+            # get_first_open_status_conversation() already returns the history as one string
+            if isinstance(conversation_history, (list, tuple)):
+                conversation_history = "\n".join(conversation_history)
             response = self.sales_chain.invoke(
                 {
                     "system_prompt": system_prompt,
                     "user_data": user_data,
                     "rag_context": rag_context,
-                    "conversation_history": "\n".join(conversation_history),
+                    "conversation_history": conversation_history,
                     "latest_user_message": user_message,
                 }
             )
-        return response
+        return extract_mail_body(response)
 
     def query_small_rag_llm(self, product_name):
         messages = [
@@ -196,11 +207,11 @@ class LLM:
         
         if scenario_type not in scenario_chains:
             print(f"[LLM Warning] Unknown scenario type: {scenario_type}, falling back to default")
-            return self.initial_sales_chain.invoke({
+            return extract_mail_body(self.initial_sales_chain.invoke({
                 "user_data": user_data,
                 "rag_context": rag_context,
                 "product_name": product_name,
-            })
+            }))
         
         chain = scenario_chains[scenario_type]
         response = chain.invoke({
@@ -209,7 +220,7 @@ class LLM:
             "product_name": product_name,
         })
         
-        return response
+        return extract_mail_body(response)
 
     def destroy(self):
         """

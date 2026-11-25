@@ -134,7 +134,7 @@ class AgentOrchestrator:
         if decision["mode"] == "active" and decision["action"] in ACTION_DIRECTIVES:
             system_prompt = f"{system_prompt}\n{ACTION_DIRECTIVES[decision['action']]}"
         response = self.llm.query_llm(
-            True, state["user_data"], state["rag_context"], system_prompt=system_prompt,
+            False, state["user_data"], state["rag_context"], system_prompt=system_prompt,
             user_message=state["user_message"],
             conversation_history=state["conversation_history"],
         )

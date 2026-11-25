@@ -9,7 +9,6 @@ MongoDB integration, and agent initiation.
 
 import sys
 import os
-import json
 from datetime import datetime
 from typing import Dict, Any
 
@@ -25,7 +24,6 @@ from utils.user_type_classifier import (
     UserType
 )
 from utils.endpoint_utils import convert_endpoint_data_to_string
-from utils.general_utils import fetch_new_user_data
 from utils.mongodb_conn import create_or_get_client
 
 

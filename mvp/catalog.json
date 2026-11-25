@@ -1,0 +1,17 @@
+{
+  "version": "housing-synthetic-v1",
+  "entries": {
+    "occupant": {
+      "id": "housing-synthetic-occupant-v1",
+      "document": "Catalogue habitation synthétique v1",
+      "locator": "§1 · Occupant",
+      "excerpt": "La formule Occupant est destinée aux personnes qui occupent le logement."
+    },
+    "non_occupant": {
+      "id": "housing-synthetic-non-occupant-v1",
+      "document": "Catalogue habitation synthétique v1",
+      "locator": "§2 · Non-occupant",
+      "excerpt": "La formule Non-occupant est destinée aux propriétaires qui n’occupent pas le logement."
+    }
+  }
+}

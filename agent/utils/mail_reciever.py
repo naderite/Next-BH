@@ -3,7 +3,6 @@ import os.path
 import base64
 import time
 import re
-from email.mime.text import MIMEText
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -12,7 +11,6 @@ from googleapiclient.errors import HttpError
 from bs4 import BeautifulSoup
 from pymongo import MongoClient, errors
 from bson.objectid import ObjectId
-from datetime import datetime
 from mongodb_conn import append_message_to_conversation, update_conversation_status
 
 # If modifying these scopes, delete the file token.json.

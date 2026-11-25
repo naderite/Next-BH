@@ -1,14 +1,11 @@
 import chromadb
-from typing import Any, Dict
-import os
 import sys
-import signal
 import atexit
 import logging
 import torch
 
 from utils import fetch_all_existing_ids, process_pdf_file, process_csv_file
-from config import *
+from config import CATEGORY_MAP, CHUNK_OVERLAP, CHUNK_SIZE, CSV_DIR, MODEL_NAME, PDF_DIR
 
 
 # --- Init Chroma ---

@@ -16,7 +16,6 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from utils.mongodb_conn import create_or_get_client, append_message_to_conversation
-from datetime import datetime
 
 def test_client_creation():
     """Test client creation with various data formats."""

@@ -4,7 +4,6 @@ Test script to validate the new scenario-specific prompts functionality.
 """
 
 import sys
-import os
 sys.path.append('/home/nader/Projects/NextBH/BH-Assurance/agent')
 
 from utils.user_profile_conn import fetch_endpoint_data, ENDPOINTS

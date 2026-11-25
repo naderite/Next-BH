@@ -11,3 +11,5 @@ python3.12 -B scripts/prepare_dashboard_snapshot.py ../bh-dashboard-pilot-source
 The export verifies the revision and includes application source, assets, configuration for building the source, and dependency lock files. The export selects individual files so upstream environment files, logs, installed dependencies, data, and bundled Git objects stay out of the pilot workspace. The historical validation handler can initiate email delivery. Use a synthetic pilot entry point when exercising approval or rejection.
 
 The pilot export is prepared separately from the existing gitlink. [BH-8 source investigation](https://maiteai.atlassian.net/browse/BH-8)
+
+The historical packed repository remains available in [Next-BH at `7173a27`](https://github.com/naderite/Next-BH/tree/7173a27ef38bf462f58adb8c09d3b255093a1d47/BH-Assurance.git). Its archived refs include `master` at `ae2963e` and `rag-optimization` at `cdbf604`. The pilot export uses the upstream revision documented above.

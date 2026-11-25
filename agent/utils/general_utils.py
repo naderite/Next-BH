@@ -1,9 +1,8 @@
 from rag_model import rag
 from intent_analysis import analyse_message
-from utils.user_profile_conn import *
+from utils.user_profile_conn import fetch_existing_user, fetch_new_user
 from utils.endpoint_utils import (
     convert_endpoint_data_to_string,
-    get_product_name_from_endpoint_data,
 )
 # User type classification now handled by API directly
 import random

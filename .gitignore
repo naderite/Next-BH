@@ -2,6 +2,7 @@ data/
 mongo_data/
 chroma_data/
 .env
+.venv-housing/
 datasets/
 __pycache__/
 *.csv

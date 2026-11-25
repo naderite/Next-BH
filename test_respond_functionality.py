@@ -32,8 +32,6 @@ except ImportError:
     SalesAgent = None
     generate_response = None
 from pymongo import MongoClient
-from datetime import datetime
-import json
 
 # MongoDB connection
 MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017/BH")

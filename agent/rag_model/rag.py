@@ -3,7 +3,6 @@ from typing import List, Dict
 from sentence_transformers import SentenceTransformer
 import chromadb
 import os
-import json
 import traceback
 import torch
 

@@ -66,6 +66,12 @@ The delivery target is an installable housing-insurance application for repeated
 
 The [housing-runtime draft PR](https://github.com/naderite/Next-BH/pull/18) adds a local FastAPI and browser application, SQLite-backed LangGraph checkpoints, a versioned synthetic Chroma catalog, and a shared simulator for offline training and online execution. A saved MaskablePPO checkpoint trained for 4,096 steps was loaded in the running service and produced three recorded decisions in a complete browser-based tenant case. The same case and trace remained available after restarting the server. This branch provides initial implementation evidence for steps 2–5. The default-branch inventory above records the audit baseline.
 
+### Housing runtime and repository audit
+
+- **Review and simulated execution.** Offers, explanations and follow-ups carry a reference to the catalog version. If the evidence reference is missing or its digest is stale at approval, the service records the reviewer verdict, closes the case and blocks the simulated contact. A model inference error or an ineligible model action falls back to rules using the same action mask. The decision records the attempted policy, fallback reason and chosen action. [Runtime changes and tests](https://github.com/naderite/Next-BH/commit/dc92de3a816f83c1df12e26b8848a28c7ed485f4)
+- **Verification.** Six local housing integration tests passed with a saved checkpoint, covering persistent review, retries, competing decisions, eligibility, catalog changes, fallback and real masked inference. A fresh 256-step checkpoint also loaded and made an eligible API decision. That short run verifies the training-to-serving path. The five-seed benchmark and simulator sensitivity evaluation remain required under step 5. [Housing CI](https://github.com/naderite/Next-BH/pull/18/checks)
+- **Checkout cleanup.** The draft PR removes an unused packed dashboard repository and an empty Kafka backup. The packed snapshot is preserved in Git history with its provenance in the dashboard runbook. The legacy worker now skips empty opportunities and routes replies through the response prompt with intact history. Full legacy operation still depends on its external data and services. [Cleanup commit](https://github.com/naderite/Next-BH/commit/de84e4c), [BH-20](https://maiteai.atlassian.net/browse/BH-20)
+
 ### How the reference plans inform the work
 
 | Reference | How it applies |

@@ -35,7 +35,8 @@ FACTURE_PP_FILE = "./reglement_facture_pp.csv"
 RENOUV_PP_FILE = "./renouvellement_contrat_pp.csv"
 RENOUV_PM_FILE = "./renouvellement_pm.csv"
 
-RESULTS_DIR = "results"
+# sample outputs are versioned in results/; local runs can write elsewhere
+RESULTS_DIR = os.getenv("API_RESULTS_DIR", "results")
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 # ----------------- Helpers for aliasing -----------------

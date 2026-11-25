@@ -47,6 +47,7 @@ DEFAULTS = {
     "POLICY_SERVICE_URL": "http://localhost:8010",
     "ARTIFACT_ROOT": str(ROOT / "artifacts"),
     "POLICY_MODEL_MANIFEST": str(ROOT / "artifacts" / "rl" / "latest.json"),
+    "API_RESULTS_DIR": str(ROOT / ".run" / "api_results"),
     "PYTHONUTF8": "1",
     "PYTHONIOENCODING": "utf-8",
 }
@@ -104,7 +105,7 @@ def run(cmd, cwd=ROOT, env=None, check=True) -> int:
     return code
 
 
-def http_ok(url: str, timeout: float = 2.0) -> bool:
+def http_ok(url: str, timeout: float = 5.0) -> bool:
     try:
         with urllib.request.urlopen(url, timeout=timeout) as r:
             return r.status < 500

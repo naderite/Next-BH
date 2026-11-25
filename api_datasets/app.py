@@ -92,9 +92,7 @@ class UserResponse(BaseModel):
 class ErrorResponse(BaseModel):
     message: str = Field(..., example="Aucun utilisateur trouvé")
 
-    class Config:
-        alias_generator = to_camel
-        allow_population_by_field_name = True
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
 
 # ----------------- Utils -----------------

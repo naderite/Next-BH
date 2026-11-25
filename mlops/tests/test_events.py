@@ -126,3 +126,14 @@ def test_relay_uses_review_timestamp_from_draft_review():
     assert event["admin_verdict"] == "approved"
     assert event["timestamp"] == reviewed.isoformat()
     assert "reviewer-1" not in str(event)  # reviewer identity stays out of the event stream
+
+
+def test_relay_marks_naive_mongo_dates_as_utc():
+    from datetime import datetime
+
+    # pymongo returns naive datetimes (UTC) unless tz_aware=True
+    messages = FakeCollection([{"_id": "m1", "status": "rejected", "decision": DECISION,
+                                "reviewed_at": datetime(2026, 11, 25, 1, 0)}])
+    producer = FakeProducer()
+    relay_verdicts(messages, EventPublisher(FakeCollection(), "decision_events", producer))
+    assert producer.sent[0][2]["timestamp"] == "2026-11-25T01:00:00+00:00"

@@ -57,6 +57,8 @@ def relay_verdicts(messages, publisher: EventPublisher, limit: int = 500) -> int
             continue
         # reviewed_at is written atomically with the decision (draft_review / review pilot)
         occurred = msg.get("reviewed_at") or msg.get("validated_at") or msg.get("updated_at")
+        if isinstance(occurred, datetime) and occurred.tzinfo is None:
+            occurred = occurred.replace(tzinfo=timezone.utc)  # MongoDB dates are UTC
         event = admin_verdict_event(
             msg["decision"], str(msg["_id"]), msg.get("conversation_id"), verdict,
             reason_code=msg.get("rejection_reason"),

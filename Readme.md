@@ -107,6 +107,8 @@ The platform is composed of several tightly integrated subsystems:
 
 ## Deployment & Operations
 
+The [architecture and implementation inventory](docs/PROJECT_ARCHITECTURE.md) traces the original prototype, insurer workbooks, tested pilot, and academic RL and MLOps design.
+
 For a local walkthrough with synthetic data, see the [company recommendation demo](docs/RECOMMENDATION_DEMO.md).
 
 The [human review demo](docs/DRAFT_REVIEW_DEMO.md) covers the isolated dashboard. The [Wave 3 staging runbook](docs/STAGING_PILOT.md) covers the full synthetic recommendation and review pilot, including its documented CI results and live staging acceptance criteria.

@@ -1,5 +1,7 @@
 # Next-BH · État d’avancement au 20 novembre 2026
 
+L’[inventaire de l’architecture et des réalisations](PROJECT_ARCHITECTURE.md) retrace aussi le prototype initial, l’origine des données et l’état de l’architecture académique.
+
 Les vagues 1 et 2 sont terminées dans Jira. La vague 3 est intégrée à `master` pour le pilote synthétique de recommandation d’assurances à des entreprises. Les contrôles en CI ont reproduit les 24 résultats attendus. La recette avec le modèle `gemma3n:e4b` et l’évaluation humaine restent en attente. [Jalon BH-12](https://maiteai.atlassian.net/browse/BH-12), [recette BH-16](https://maiteai.atlassian.net/browse/BH-16)
 
 ## Livraisons et traçabilité

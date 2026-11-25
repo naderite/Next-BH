@@ -1,12 +1,10 @@
 # Next Deal — Comprehensive Documentation
 
-L’[application habitation Next-BH](docs/HOUSING_RUNTIME.md) permet de créer des dossiers simulés, valider des brouillons sourcés et reprendre les échanges après un redémarrage. Le guide couvre aussi la construction du catalogue et l’entraînement de la politique.
-
 Le [suivi d’avancement de Next-BH](docs/AVANCEMENT.md) décrit le périmètre livré, l’architecture du pilote de recommandation, les preuves Jira et GitHub, et les travaux restants. Le [prompt du rapport en français](docs/PROMPT_RAPPORT_AVANCEMENT.md) précise les fichiers à produire et les captures à réunir.
 
-## Supported local workflows
+## Executive Summary
 
-Use the housing application above for simulated individual cases with persistent review. Use the [staging runbook](docs/STAGING_SETUP.md) for the separate company recommendation and draft review pilot. Both workflows use synthetic inputs and produce zero outbound customer messages. [Architecture inventory and roadmap](https://github.com/naderite/Next-BH/pull/17)
+Use the [housing application](docs/HOUSING_RUNTIME.md) for simulated individual cases with persistent review. Use the [staging runbook](docs/STAGING_SETUP.md) for the separate company recommendation and draft review pilot. Both workflows use synthetic inputs and produce zero outbound customer messages.
 
 ---
 
